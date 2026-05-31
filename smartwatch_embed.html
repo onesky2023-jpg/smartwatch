@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>스마트워치 음성 AI — 인터랙티브 목업</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendart@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes waveform{0%,100%{height:4px}50%{height:var(--h)}}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#060A10;overflow-x:auto}
+button:hover{filter:brightness(1.1)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const C = {
+  bg:"#060A10",surface:"#0E1219",card:"#151B24",elevated:"#1C2430",border:"#232D3B",
+  accent:"#00D4AA",accentDim:"rgba(0,212,170,0.08)",
+  blue:"#4B9FFF",blueDim:"rgba(75,159,255,0.08)",
+  red:"#FF4D6A",redDim:"rgba(255,77,106,0.08)",
+  amber:"#FFAD30",amberDim:"rgba(255,173,48,0.08)",
+  text:"#E6EAF0",sub:"#7E8A9C",dim:"#454F5F",
+  glass:"rgba(14,18,25,0.88)",
+};
+
+const WatchFrame = ({children,size=160})=>(
+  <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
+    <div style={{width:size*.38,height:size*.32,borderRadius:`${size*.19}px ${size*.19}px 4px 4px`,background:"linear-gradient(180deg,#222833,#2a3040)",border:"1px solid #363e4e"}}/>
+    <div style={{width:size,height:size,borderRadius:size*.22,background:"linear-gradient(145deg,#1a2030,#141a24)",border:"2px solid #2e3646",boxShadow:"0 10px 40px rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
+      <div style={{position:"absolute",right:-4,top:"38%",width:5,height:14,borderRadius:2,background:"linear-gradient(180deg,#3a4258,#2e3646)",border:"1px solid #4a5268"}}/>
+      <div style={{width:size*.78,height:size*.78,borderRadius:size*.16,overflow:"hidden",background:C.bg}}>{children}</div>
+    </div>
+    <div style={{width:size*.38,height:size*.32,borderRadius:`4px 4px ${size*.19}px ${size*.19}px`,background:"linear-gradient(180deg,#2a3040,#222833)",border:"1px solid #363e4e"}}/>
+  </div>
+);
+
+const Waves = ({color=C.amber,heights=[10,16,6,20,12,8,18,6,14,10]})=>(
+  <div style={{display:"flex",justifyContent:"center",gap:2,height:16,alignItems:"center"}}>
+    {heights.map((h,i)=><div key={i} style={{width:2.5,borderRadius:2,background:color,animation:`waveform 0.${4+(i%3)}s ease-in-out infinite`,animationDelay:`${i*.05}s`,"--h":`${h}px`}}/>)}
+  </div>
+);
+
+const VBadge = ({size=12})=>(
+  <div style={{width:size,height:size,borderRadius:size*.25,background:`linear-gradient(135deg,${C.accent},${C.blue})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:size*.45,fontWeight:900,color:"#000"}}>V</div>
+);
+
+function App(){
+  const [showResp,setShowResp]=useState(false);
+  const [emStep,setEmStep]=useState(0);
+  const [agStep,setAgStep]=useState(0);
+
+  const SZ=155;
+
+  return(
+    <div style={{fontFamily:"'Pretendard Variable','SF Pro Display',-apple-system,sans-serif",color:C.text,padding:"20px 16px",display:"flex",flexDirection:"column",alignItems:"center",gap:16,minWidth:900}}>
+
+      {/* Title */}
+      <div style={{textAlign:"center",marginBottom:4}}>
+        <div style={{fontSize:13,fontWeight:800,color:C.text}}>⌚ 스마트워치 — 보호자 음성 AI 인터페이스</div>
+      </div>
+
+      {/* 5 Watches */}
+      <div style={{display:"flex",gap:28,alignItems:"flex-start",flexWrap:"nowrap"}}>
+
+        {/* 1. Idle */}
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:10}}>
+          <div style={{fontSize:9,color:C.sub,letterSpacing:1,textTransform:"uppercase"}}>평시 — 알림 없음</div>
+          <WatchFrame size={SZ}>
+            <div style={{width:"100%",height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:8}}>
+              <div style={{fontSize:6,color:C.dim}}>05.29 목</div>
+              <div style={{fontSize:22,fontWeight:900,color:C.text,marginBottom:6}}>21:45</div>
+              <div style={{display:"flex",alignItems:"center",gap:3,padding:"2px 7px",borderRadius:5,background:C.accentDim}}>
+                <div style={{width:4,height:4,borderRadius:"50%",background:C.accent,boxShadow:`0 0 4px ${C.accent}`}}/>
+                <span style={{fontSize:7,color:C.accent,fontWeight:600}}>환자 안전</span>
+              </div>
+              <div style={{fontSize:6,color:C.dim,marginTop:4}}>거실 · TV 시청 중</div>
+            </div>
+          </WatchFrame>
+          <div style={{fontSize:10,color:C.sub,maxWidth:150,textAlign:"center",lineHeight:1.6}}>평시에는 시간 + 상태만<br/>알림 없음</div>
+        </div>
+
+        {/* 2. Emergency */}
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:10}}>
+          <div style={{fontSize:9,color:C.red,letterSpacing:1,textTransform:"uppercase",fontWeight:700}}>🚨 긴급 알림</div>
+          <WatchFrame size={SZ}>
+            <div style={{width:"100%",height:"100%",display:"flex",flexDirection:"column",padding:8,background:`radial-gradient(ellipse at center,${C.redDim},${C.bg})`}}>
+              <div style={{textAlign:"center",marginBottom:4}}>
+                <div style={{fontSize:18,animation:"pulse 1s infinite"}}>🚨</div>
+                <div style={{fontSize:9,fontWeight:800,color:C.red}}>낙상 감지</div>
+                <div style={{fontSize:6,color:C.sub}}>주방 · 방금 전</div>
+              </div>
+              <div style={{padding:"4px 6px",borderRadius:6,background:C.glass,border:`1px solid ${C.border}`,marginBottom:4}}>
+                <div style={{fontSize:8,color:C.text,fontWeight:600,lineHeight:1.4,textAlign:"center"}}>"아버지가 주방에서 넘어졌어요. 지금 바로 확인해주세요."</div>
+              </div>
+              <div style={{display:"flex",gap:3}}>
+                <div style={{flex:1,padding:"4px 0",borderRadius:5,background:C.red,textAlign:"center",fontSize:7,fontWeight:700,color:"#fff"}}>119 호출</div>
+                <div style={{flex:1,padding:"4px 0",borderRadius:5,background:C.elevated,border:`1px solid ${C.border}`,textAlign:"center",fontSize:7,fontWeight:700,color:C.text}}>확인</div>
+              </div>
+            </div>
+          </WatchFrame>
+          <div style={{fontSize:10,color:C.sub,maxWidth:150,textAlign:"center",lineHeight:1.6}}>긴급 시에만 음성 + 진동<br/>한 문장 전달</div>
+        </div>
+
+        {/* 3. Emergency Voice Guide */}
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:10}}>
+          <div style={{fontSize:9,color:C.amber,letterSpacing:1,textTransform:"uppercase",fontWeight:700}}>🗣️ 긴급 대응 질의</div>
+          <WatchFrame size={SZ}>
+            <div style={{width:"100%",height:"100%",display:"flex",flexDirection:"column",padding:8,background:`radial-gradient(ellipse at center,${C.amberDim},${C.bg})`}}>
+              {emStep===0&&(
+                <div onClick={()=>setEmStep(1)} style={{cursor:"pointer",flex:1,display:"flex",flexDirection:"column",justifyContent:"center"}}>
+                  <div style={{textAlign:"center",marginBottom:3}}><div style={{fontSize:12}}>🚨</div><div style={{fontSize:7,fontWeight:700,color:C.red}}>낙상 감지 · 주방</div></div>
+                  <div style={{padding:"3px 6px",borderRadius:6,background:C.elevated,border:`1px solid ${C.border}`,marginBottom:3}}>
+                    <div style={{fontSize:8,color:C.text,textAlign:"center"}}>"아버지가 넘어졌어요."</div>
+                  </div>
+                  <Waves color={C.amber}/>
+                  <div style={{fontSize:7,color:C.amber,fontWeight:600,textAlign:"center",marginTop:2}}>"어떻게 해야 해?"</div>
+                  <div style={{fontSize:5,color:C.dim,textAlign:"center",marginTop:2}}>탭 →</div>
+                </div>
+              )}
+              {emStep===1&&(
+                <div onClick={()=>setEmStep(2)} style={{cursor:"pointer",flex:1,display:"flex",flexDirection:"column",justifyContent:"center",animation:"fadeIn 0.3s"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:3,justifyContent:"center",marginBottom:4}}><VBadge/><span style={{fontSize:7,color:C.accent,fontWeight:700}}>AI 대응 안내</span></div>
+                  <div style={{padding:"5px 6px",borderRadius:6,background:C.elevated,border:`1px solid ${C.amber}33`,marginBottom:4}}>
+                    <div style={{fontSize:8,color:C.text,fontWeight:600,lineHeight:1.5,textAlign:"center"}}>"움직이지 말게 하고 머리와 목을 고정해주세요. 출혈이 있으면 수건으로 눌러주세요."</div>
+                  </div>
+                  <Waves heights={[8,14,10,18,6,16,10,12,8,14]}/>
+                  <div style={{fontSize:7,color:C.amber,fontWeight:600,textAlign:"center",marginTop:2}}>"의식은 있는 것 같은데?"</div>
+                  <div style={{fontSize:5,color:C.dim,textAlign:"center",marginTop:2}}>탭 →</div>
+                </div>
+              )}
+              {emStep===2&&(
+                <div onClick={()=>setEmStep(0)} style={{cursor:"pointer",flex:1,display:"flex",flexDirection:"column",justifyContent:"center",animation:"fadeIn 0.3s"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:3,justifyContent:"center",marginBottom:4}}><VBadge/><span style={{fontSize:7,color:C.accent,fontWeight:700}}>AI 후속 안내</span></div>
+                  <div style={{padding:"5px 6px",borderRadius:6,background:C.elevated,border:`1px solid ${C.accent}33`,marginBottom:4}}>
+                    <div style={{fontSize:8,color:C.text,fontWeight:600,lineHeight:1.5,textAlign:"center"}}>"의식이 있으면 억지로 일으키지 마세요. 이름을 부르며 말을 걸고, 통증 부위를 확인해주세요."</div>
+                  </div>
+                  <div style={{display:"flex",gap:3}}>
+                    <div style={{flex:1,padding:"3px 0",borderRadius:5,background:C.red,textAlign:"center",fontSize:7,fontWeight:700,color:"#fff"}}>119 호출</div>
+                    <div style={{flex:1,padding:"3px 0",borderRadius:5,background:C.accentDim,border:`1px solid ${C.accent}33`,textAlign:"center",fontSize:7,fontWeight:700,color:C.accent}}>해결됨</div>
+                  </div>
+                  <div style={{fontSize:5,color:C.dim,textAlign:"center",marginTop:3}}>탭하면 처음부터</div>
+                </div>
+              )}
+            </div>
+          </WatchFrame>
+          <div style={{fontSize:10,color:C.sub,maxWidth:150,textAlign:"center",lineHeight:1.6}}>"어떻게 해?" 물으면<br/>즉시 대응법 안내</div>
+        </div>
+
+        {/* 4. Voice Q&A */}
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:10}}>
+          <div style={{fontSize:9,color:C.accent,letterSpacing:1,textTransform:"uppercase",fontWeight:700}}>🎤 음성 질의</div>
+          <WatchFrame size={SZ}>
+            <div style={{width:"100%",height:"100%",display:"flex",flexDirection:"column",padding:8,justifyContent:"center"}}>
+              {!showResp?(
+                <div onClick={()=>setShowResp(true)} style={{cursor:"pointer",textAlign:"center"}}>
+                  <Waves color={C.accent} heights={[12,18,8,22,14,10,20,6,16,12]}/>
+                  <div style={{fontSize:8,color:C.accent,fontWeight:600,marginTop:4}}>듣고 있어요...</div>
+                  <div style={{padding:"4px 6px",borderRadius:6,background:C.elevated,border:`1px solid ${C.border}`,marginTop:5}}>
+                    <div style={{fontSize:8,color:C.text}}>"지금 아버지 괜찮아?"</div>
+                  </div>
+                  <div style={{fontSize:5,color:C.dim,marginTop:5}}>탭하면 응답 보기</div>
+                </div>
+              ):(
+                <div onClick={()=>setShowResp(false)} style={{cursor:"pointer",animation:"fadeIn 0.3s"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:3,justifyContent:"center",marginBottom:5}}><VBadge size={14}/><span style={{fontSize:7,color:C.accent,fontWeight:700}}>AI 응답</span></div>
+                  <div style={{padding:"5px 7px",borderRadius:7,background:C.elevated,border:`1px solid ${C.accent}33`}}>
+                    <div style={{fontSize:8,color:C.text,fontWeight:600,lineHeight:1.5,textAlign:"center"}}>"거실에서 TV 보고 계세요. 이상 없습니다."</div>
+                  </div>
+                  <div style={{fontSize:5,color:C.dim,textAlign:"center",marginTop:5}}>탭하면 질문 모드</div>
+                </div>
+              )}
+            </div>
+          </WatchFrame>
+          <div style={{fontSize:10,color:C.sub,maxWidth:150,textAlign:"center",lineHeight:1.6}}>언제든 음성으로 질문<br/>한 문장으로 즉답</div>
+        </div>
+
+        {/* 5. Aggression Scenario */}
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:10}}>
+          <div style={{fontSize:9,color:C.red,letterSpacing:1,textTransform:"uppercase",fontWeight:700}}>⚡ 공격성 대응 시나리오</div>
+          <WatchFrame size={SZ}>
+            <div style={{width:"100%",height:"100%",display:"flex",flexDirection:"column",padding:8,background:agStep===0?`radial-gradient(ellipse at center,${C.redDim},${C.bg})`:C.bg}}>
+              {agStep===0&&(
+                <div onClick={()=>setAgStep(1)} style={{cursor:"pointer",flex:1,display:"flex",flexDirection:"column",justifyContent:"center"}}>
+                  <div style={{textAlign:"center",marginBottom:3}}><div style={{fontSize:12,animation:"pulse 1s infinite"}}>⚡</div><div style={{fontSize:8,fontWeight:800,color:C.red}}>공격 행동 감지</div><div style={{fontSize:6,color:C.sub}}>거실 · 물건 던짐</div></div>
+                  <div style={{padding:"3px 6px",borderRadius:6,background:C.glass,border:`1px solid ${C.border}`,marginBottom:3}}>
+                    <div style={{fontSize:7,color:C.text,fontWeight:600,textAlign:"center",lineHeight:1.3}}>"아버지가 거실에서 물건을 던지고 있어요. 주의하세요."</div>
+                  </div>
+                  <Waves/>
+                  <div style={{fontSize:7,color:C.amber,fontWeight:600,textAlign:"center",marginTop:1}}>"어떻게 해야 해?"</div>
+                  <div style={{fontSize:5,color:C.dim,textAlign:"center",marginTop:2}}>탭 →</div>
+                </div>
+              )}
+              {agStep===1&&(
+                <div onClick={()=>setAgStep(2)} style={{cursor:"pointer",flex:1,display:"flex",flexDirection:"column",justifyContent:"center",animation:"fadeIn 0.3s"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:3,justifyContent:"center",marginBottom:4}}><VBadge/><span style={{fontSize:7,color:C.accent,fontWeight:700}}>AI 대응 안내</span></div>
+                  <div style={{padding:"4px 6px",borderRadius:6,background:C.elevated,border:`1px solid ${C.amber}33`,marginBottom:3}}>
+                    <div style={{fontSize:7,color:C.text,fontWeight:600,lineHeight:1.5,textAlign:"center"}}>"거리를 유지하세요. 절대 제지하거나 말리지 마세요. 위험한 물건만 치워주세요."</div>
+                  </div>
+                  <Waves heights={[8,14,10,18,6,16,10,12,8,14]}/>
+                  <div style={{fontSize:7,color:C.amber,fontWeight:600,textAlign:"center",marginTop:1}}>"말을 걸어도 돼?"</div>
+                  <div style={{fontSize:5,color:C.dim,textAlign:"center",marginTop:2}}>탭 →</div>
+                </div>
+              )}
+              {agStep===2&&(
+                <div onClick={()=>setAgStep(3)} style={{cursor:"pointer",flex:1,display:"flex",flexDirection:"column",justifyContent:"center",animation:"fadeIn 0.3s"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:3,justifyContent:"center",marginBottom:4}}><VBadge/><span style={{fontSize:7,color:C.accent,fontWeight:700}}>AI 후속 안내</span></div>
+                  <div style={{padding:"4px 6px",borderRadius:6,background:C.elevated,border:`1px solid ${C.accent}33`,marginBottom:3}}>
+                    <div style={{fontSize:7,color:C.text,fontWeight:600,lineHeight:1.5,textAlign:"center"}}>"낮고 차분한 목소리로 짧게 말하세요. '아버지, 저예요. 괜찮아요.' 논리적 설득은 하지 마세요."</div>
+                  </div>
+                  <Waves heights={[12,8,16,10,14,6,12,18,8,10]}/>
+                  <div style={{fontSize:7,color:C.amber,fontWeight:600,textAlign:"center",marginTop:1}}>"진정이 안 되면?"</div>
+                  <div style={{fontSize:5,color:C.dim,textAlign:"center",marginTop:2}}>탭 →</div>
+                </div>
+              )}
+              {agStep===3&&(
+                <div onClick={()=>setAgStep(4)} style={{cursor:"pointer",flex:1,display:"flex",flexDirection:"column",justifyContent:"center",animation:"fadeIn 0.3s"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:3,justifyContent:"center",marginBottom:4}}><VBadge/><span style={{fontSize:7,color:C.accent,fontWeight:700}}>AI 후속 안내</span></div>
+                  <div style={{padding:"4px 6px",borderRadius:6,background:C.elevated,border:`1px solid ${C.amber}33`,marginBottom:3}}>
+                    <div style={{fontSize:7,color:C.text,fontWeight:600,lineHeight:1.5,textAlign:"center"}}>"방에서 나와서 문을 닫고 5분 기다려주세요. 자극 없이 혼자 두면 대부분 가라앉아요."</div>
+                  </div>
+                  <Waves heights={[6,12,8,14,10,16,8,12,6,10]}/>
+                  <div style={{fontSize:7,color:C.amber,fontWeight:600,textAlign:"center",marginTop:1}}>"그래도 안 되면?"</div>
+                  <div style={{fontSize:5,color:C.dim,textAlign:"center",marginTop:2}}>탭 →</div>
+                </div>
+              )}
+              {agStep===4&&(
+                <div onClick={()=>setAgStep(0)} style={{cursor:"pointer",flex:1,display:"flex",flexDirection:"column",justifyContent:"center",animation:"fadeIn 0.3s"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:3,justifyContent:"center",marginBottom:4}}>
+                    <div style={{width:12,height:12,borderRadius:3,background:`linear-gradient(135deg,${C.red},${C.amber})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:6,fontWeight:900,color:"#fff"}}>!</div>
+                    <span style={{fontSize:7,color:C.red,fontWeight:700}}>에스컬레이션</span>
+                  </div>
+                  <div style={{padding:"4px 6px",borderRadius:6,background:C.elevated,border:`1px solid ${C.red}33`,marginBottom:4}}>
+                    <div style={{fontSize:7,color:C.text,fontWeight:600,lineHeight:1.5,textAlign:"center"}}>"10분 넘게 지속되면 전문 도움이 필요해요. 담당의나 119에 연락하세요."</div>
+                  </div>
+                  <div style={{display:"flex",gap:3}}>
+                    <div style={{flex:1,padding:"3px 0",borderRadius:5,background:C.red,textAlign:"center",fontSize:7,fontWeight:700,color:"#fff"}}>119 호출</div>
+                    <div style={{flex:1,padding:"3px 0",borderRadius:5,background:C.elevated,border:`1px solid ${C.border}`,textAlign:"center",fontSize:7,fontWeight:700,color:C.text}}>담당의</div>
+                  </div>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:3,marginTop:4,padding:"2px 5px",borderRadius:3,background:C.accentDim}}>
+                    <div style={{width:3,height:3,borderRadius:"50%",background:C.accent}}/>
+                    <span style={{fontSize:5,color:C.accent,fontWeight:600}}>에피소드 자동 기록됨</span>
+                  </div>
+                  <div style={{fontSize:5,color:C.dim,textAlign:"center",marginTop:2}}>탭 → 처음부터</div>
+                </div>
+              )}
+            </div>
+          </WatchFrame>
+          <div style={{fontSize:10,color:C.sub,maxWidth:150,textAlign:"center",lineHeight:1.6}}>공격 행동 → 질문마다<br/>대응 안내</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App/>, document.getElementById("root"));
+</script>
+</body>
+</html>
