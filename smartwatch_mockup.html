@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>스마트워치 — 보호자 음성 AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0B0B0F;
+  --bg2: #131318;
+  --bg3: #1A1A22;
+  --card: #16161E;
+  --border: #2A2A35;
+  --text: #E8E6E3;
+  --text-dim: #8A8A95;
+  --text-muted: #55555F;
+  --red: #FF4D4F;
+  --red-bg: rgba(255, 77, 79, 0.12);
+  --red-glow: rgba(255, 77, 79, 0.25);
+  --amber: #FAAD14;
+  --amber-bg: rgba(250, 173, 20, 0.12);
+  --amber-glow: rgba(250, 173, 20, 0.25);
+  --green: #52C41A;
+  --green-bg: rgba(82, 196, 26, 0.12);
+  --teal: #13C2C2;
+  --teal-bg: rgba(19, 194, 194, 0.12);
+  --teal-glow: rgba(19, 194, 194, 0.25);
+  --purple: #9254DE;
+  --purple-bg: rgba(146, 84, 222, 0.12);
+  --blue: #4096FF;
+  --blue-bg: rgba(64, 150, 255, 0.12);
+  --watch-bg: #0D0D12;
+  --watch-border: #2E2E38;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ── Header ── */
+.header {
+  text-align: center;
+  padding: 64px 0 40px;
+  position: relative;
+}
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+.header h1 {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+.header h1 span { color: var(--teal); }
+.header .subtitle {
+  font-size: 14px;
+  color: var(--text-dim);
+  font-weight: 300;
+}
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+.tab {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tab:hover { border-color: var(--text-muted); color: var(--text); }
+.tab.active {
+  background: var(--teal-bg);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+.tab-icon { margin-right: 6px; }
+
+/* ── Section ── */
+.section {
+  padding: 56px 0;
+  position: relative;
+}
+.section + .section {
+  border-top: 1px solid var(--border);
+}
+.section-label {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.section-flow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.section-flow .arrow {
+  color: var(--teal);
+  font-size: 16px;
+}
+.section-desc {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+
+/* ── Category labels ── */
+.category-row {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+.category-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.category-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* ── Watch grid ── */
+.watch-row {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+/* ── Watch frame ── */
+.watch-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.watch-frame {
+  width: 220px;
+  height: 270px;
+  background: var(--watch-bg);
+  border: 2px solid var(--watch-border);
+  border-radius: 36px;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+.watch-frame::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 3px;
+  background: var(--watch-border);
+  border-radius: 0 0 4px 4px;
+}
+/* Crown button */
+.watch-frame::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 28px;
+  background: var(--watch-border);
+  border-radius: 0 3px 3px 0;
+}
+
+/* Severity glow */
+.watch-frame.glow-red {
+  border-color: rgba(255, 77, 79, 0.4);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 30px var(--red-glow), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+.watch-frame.glow-amber {
+  border-color: rgba(250, 173, 20, 0.4);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 30px var(--amber-glow), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+.watch-frame.glow-teal {
+  border-color: rgba(19, 194, 194, 0.4);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 30px var(--teal-glow), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+.watch-frame.glow-purple {
+  border-color: rgba(146, 84, 222, 0.4);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(146,84,222,0.2), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+/* Watch inner elements */
+.watch-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  align-self: flex-start;
+  letter-spacing: 0.3px;
+}
+.badge-red { background: var(--red-bg); color: var(--red); }
+.badge-amber { background: var(--amber-bg); color: var(--amber); }
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-teal { background: var(--teal-bg); color: var(--teal); }
+.badge-purple { background: var(--purple-bg); color: var(--purple); }
+.badge-blue { background: var(--blue-bg); color: var(--blue); }
+
+.watch-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 8px;
+  line-height: 1.3;
+}
+.watch-subtitle {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.watch-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  gap: 6px;
+}
+.watch-speech {
+  font-size: 11px;
+  color: var(--text);
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 8px;
+  border-left: 2px solid var(--text-muted);
+  line-height: 1.5;
+}
+.watch-speech.ai {
+  border-left-color: var(--teal);
+  background: var(--teal-bg);
+}
+.watch-speech.alert-red {
+  border-left-color: var(--red);
+  background: var(--red-bg);
+}
+
+/* Waveform */
+.waveform {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 0;
+}
+.waveform .bar {
+  width: 3px;
+  border-radius: 2px;
+  animation: wave 1.2s ease-in-out infinite;
+}
+.waveform .bar:nth-child(1) { height: 8px; animation-delay: 0s; }
+.waveform .bar:nth-child(2) { height: 16px; animation-delay: 0.1s; }
+.waveform .bar:nth-child(3) { height: 12px; animation-delay: 0.2s; }
+.waveform .bar:nth-child(4) { height: 20px; animation-delay: 0.3s; }
+.waveform .bar:nth-child(5) { height: 14px; animation-delay: 0.15s; }
+.waveform .bar:nth-child(6) { height: 10px; animation-delay: 0.25s; }
+.waveform .bar:nth-child(7) { height: 18px; animation-delay: 0.05s; }
+.waveform .bar:nth-child(8) { height: 8px; animation-delay: 0.35s; }
+
+@keyframes wave {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.4); }
+}
+
+.watch-prompt {
+  font-size: 10px;
+  color: var(--teal);
+  text-align: center;
+  margin-top: auto;
+  cursor: pointer;
+}
+.watch-prompt:hover { text-decoration: underline; }
+
+/* Watch action buttons */
+.watch-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+}
+.watch-btn {
+  flex: 1;
+  padding: 5px 0;
+  border-radius: 6px;
+  font-size: 9px;
+  font-weight: 600;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+}
+.watch-btn-primary {
+  background: var(--teal);
+  color: #000;
+}
+.watch-btn-secondary {
+  background: rgba(255,255,255,0.08);
+  color: var(--text-dim);
+}
+.watch-btn-red {
+  background: var(--red);
+  color: #fff;
+}
+
+/* Caption under watch */
+.watch-caption {
+  text-align: center;
+  max-width: 200px;
+}
+.watch-caption-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.watch-caption-desc {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* ── Health metrics in watch ── */
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.metric-row:last-child { border-bottom: none; }
+.metric-label {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+.metric-value {
+  font-size: 12px;
+  font-weight: 700;
+}
+.metric-value.warn { color: var(--amber); }
+.metric-value.danger { color: var(--red); }
+.metric-value.ok { color: var(--green); }
+
+/* Gauge */
+.gauge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 6px 0;
+}
+.gauge-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.gauge-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s;
+}
+.gauge-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* ── Flow diagram section ── */
+.flow-section {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+.flow-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  position: relative;
+}
+.flow-step + .flow-step { margin-top: 8px; }
+.flow-line {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 32px;
+}
+.flow-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid;
+  background: var(--bg);
+  z-index: 1;
+  flex-shrink: 0;
+}
+.flow-connector {
+  width: 2px;
+  height: 48px;
+  margin: 4px 0;
+}
+.flow-content {
+  flex: 1;
+  padding: 10px 16px;
+  background: var(--card);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.flow-content h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.flow-content p {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* ── Tech specs ── */
+.specs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+.spec-card {
+  padding: 16px;
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.spec-card-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.spec-card-value {
+  font-size: 13px;
+  font-weight: 600;
+}
+.spec-card-desc {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .container { padding: 0 16px; }
+  .header h1 { font-size: 24px; }
+  .watch-row { gap: 24px; }
+  .watch-frame { width: 190px; height: 240px; padding: 16px 12px; }
+  .specs-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Pulse animation for critical ── */
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 20px var(--red-glow); }
+  50% { box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 40px var(--red-glow); }
+}
+.pulse-red { animation: pulse-red 2s ease-in-out infinite; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section { animation: fadeInUp 0.6s ease-out; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ════════ HEADER ════════ -->
+  <div class="header">
+    <h1>치매 보호자 실시간 대응 <span>AI</span> 시스템</h1>
+    <p class="subtitle">카메라(환자 감지+음성 키워드) · 스마트워치(보호자 음성 AI) · 모바일 앱(모니터링+데이터)</p>
+    <div class="tabs">
+      <div class="tab"><span class="tab-icon">⚙</span>시스템 구조</div>
+      <div class="tab"><span class="tab-icon">📹</span>카메라 AI</div>
+      <div class="tab active"><span class="tab-icon">⌚</span>스마트워치</div>
+      <div class="tab"><span class="tab-icon">📱</span>모바일 앱</div>
+    </div>
+  </div>
+
+  <!-- ════════ SECTION 1: 긴급 알림 수신 ════════ -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-flow">
+        긴급 알림 수신 <span class="arrow">→</span> 긴급도별 차등 알림
+      </div>
+      <p class="section-desc">카메라가 위험을 감지하면, 스마트워치가 긴급도에 따라 다르게 알린다</p>
+    </div>
+
+    <div class="category-row">
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--red)"></div>
+        <span style="color:var(--red)">즉시 대응</span>
+      </div>
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--amber)"></div>
+        <span style="color:var(--amber)">주의 관찰</span>
+      </div>
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--green)"></div>
+        <span style="color:var(--green)">기록용</span>
+      </div>
+    </div>
+
+    <div class="watch-row">
+
+      <!-- Watch 1: 🔴 즉시 대응 — 낙상 -->
+      <div class="watch-wrap">
+        <div class="watch-frame glow-red pulse-red">
+          <div class="watch-badge badge-red">🔴 즉시 대응</div>
+          <div class="watch-title" style="color:var(--red)">낙상 감지</div>
+          <div class="watch-subtitle">안방 · 23:15</div>
+          <div class="watch-body">
+            <div class="watch-speech alert-red">
+              "어머니가 안방에서 넘어지신 것 같습니다. 즉시 확인해주세요."
+            </div>
+            <div class="waveform">
+              <div class="bar" style="background:var(--red)"></div>
+              <div class="bar" style="background:var(--red)"></div>
+              <div class="bar" style="background:var(--red)"></div>
+              <div class="bar" style="background:var(--red)"></div>
+              <div class="bar" style="background:var(--red)"></div>
+              <div class="bar" style="background:var(--red)"></div>
+              <div class="bar" style="background:var(--red)"></div>
+              <div class="bar" style="background:var(--red)"></div>
+            </div>
+            <div class="watch-actions">
+              <div class="watch-btn watch-btn-red">119 전화</div>
+              <div class="watch-btn watch-btn-primary">대응법 듣기</div>
+            </div>
+          </div>
+        </div>
+        <div class="watch-caption">
+          <div class="watch-caption-title">낙상 즉시 대응</div>
+          <div class="watch-caption-desc">강한 햅틱 반복 + 전체 화면 알림 + 사운드. 119 원터치 연결</div>
+        </div>
+      </div>
+
+      <!-- Watch 2: 🔴 즉시 대응 — 외출 시도 -->
+      <div class="watch-wrap">
+        <div class="watch-frame glow-red">
+          <div class="watch-badge badge-red">🔴 즉시 대응</div>
+          <div class="watch-title" style="color:var(--red)">배회 위험</div>
+          <div class="watch-subtitle">현관 · 22:30</div>
+          <div class="watch-body">
+            <div class="watch-speech alert-red">
+              "현관 앞에서 '집에 가야 돼' 반복 발화. 10분간 문 근처 서성임."
+            </div>
+            <div class="watch-speech" style="font-size:10px; color:var(--text-muted); border-left-color:var(--text-muted)">
+              배회 위험 · 신뢰도 94%
+            </div>
+            <div class="watch-actions">
+              <div class="watch-btn watch-btn-primary">대응법 듣기</div>
+              <div class="watch-btn watch-btn-secondary">CCTV 보기</div>
+            </div>
+          </div>
+        </div>
+        <div class="watch-caption">
+          <div class="watch-caption-title">야간 배회 감지</div>
+          <div class="watch-caption-desc">행동(서성임) + 음성("집에 가야 돼") 복합 분석으로 BPSD 판정</div>
+        </div>
+      </div>
+
+      <!-- Watch 3: 🟡 주의 관찰 -->
+      <div class="watch-wrap">
+        <div class="watch-frame glow-amber">
+          <div class="watch-badge badge-amber">🟡 주의 관찰</div>
+          <div class="watch-title" style="color:var(--amber)">불안 증가</div>
+          <div class="watch-subtitle">거실 · 14:30</div>
+          <div class="watch-body">
+            <div class="watch-speech" style="border-left-color:var(--amber); background:var(--amber-bg)">
+              "보호자 호출 5회 반복. 같은 질문 3회 이상 감지."
+            </div>
+            <div class="watch-speech" style="font-size:10px; color:var(--text-muted); border-left-color:var(--text-muted)">
+              불안/초조 · 신뢰도 78%
+            </div>
+            <div class="watch-actions">
+              <div class="watch-btn watch-btn-primary">대응법 듣기</div>
+              <div class="watch-btn watch-btn-secondary">나중에</div>
+            </div>
+          </div>
+        </div>
+        <div class="watch-caption">
+          <div class="watch-caption-title">반복 호출/질문 감지</div>
+          <div class="watch-caption-desc">중간 햅틱 1회 + 화면 알림. 즉시 대응 불요, 관찰 권고</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════ SECTION 2: 음성 AI 대응 가이드 ════════ -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-flow">
+        보호자 질의 <span class="arrow">→</span> 음성으로 가이드 제공
+      </div>
+      <p class="section-desc">보호자가 워치에 말을 걸면, 환자 이력과 현재 상황을 결합한 맞춤형 대응법을 TTS로 안내</p>
+    </div>
+
+    <div class="category-row">
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--red)"></div>
+        <span style="color:var(--red)">긴급 대응 질의</span>
+      </div>
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--teal)"></div>
+        <span style="color:var(--teal)">음성 질의</span>
+      </div>
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--purple)"></div>
+        <span style="color:var(--purple)">후속 대화</span>
+      </div>
+    </div>
+
+    <div class="watch-row">
+
+      <!-- Watch 4: 긴급 대응 질의 -->
+      <div class="watch-wrap">
+        <div class="watch-frame glow-red">
+          <div class="watch-badge badge-red">긴급 대응 질의</div>
+          <div class="watch-title" style="color:var(--red)">낙상 감지 · 주방</div>
+          <div class="watch-body">
+            <div class="watch-speech" style="border-left-color:var(--amber)">
+              "아버지가 넘어졌어요."
+            </div>
+            <div class="waveform">
+              <div class="bar" style="background:var(--teal)"></div>
+              <div class="bar" style="background:var(--teal)"></div>
+              <div class="bar" style="background:var(--teal)"></div>
+              <div class="bar" style="background:var(--teal)"></div>
+              <div class="bar" style="background:var(--teal)"></div>
+              <div class="bar" style="background:var(--teal)"></div>
+              <div class="bar" style="background:var(--teal)"></div>
+              <div class="bar" style="background:var(--teal)"></div>
+            </div>
+            <div class="watch-speech ai" style="font-size:10px">
+              "먼저 아버지 의식이 있는지 확인하시고, 움직이지 마세요. 머리를 부딪치셨다면 119에 연락하세요."
+            </div>
+            <div class="watch-prompt">답변 →</div>
+          </div>
+        </div>
+        <div class="watch-caption">
+          <div class="watch-caption-title">긴급 상황 즉시 가이드</div>
+          <div class="watch-caption-desc">질문마다 즉시 대응 안내. 119 연결 판단까지 AI가 보조</div>
+        </div>
+      </div>
+
+      <!-- Watch 5: 일반 음성 질의 -->
+      <div class="watch-wrap">
+        <div class="watch-frame glow-teal">
+          <div class="watch-badge badge-teal">음성 질의</div>
+          <div class="watch-title" style="color:var(--teal)">듣고 있어요...</div>
+          <div class="watch-body">
+            <div class="watch-speech">
+              "엄마가 자꾸 나가려고 해. 어떻게 해야 돼?"
+            </div>
+            <div class="waveform">
+              <div class="bar" style="background:var(--teal)"></div>
+              <div class="bar" style="background:var(--teal)"></div>
+              <div class="bar" style="background:var(--teal)"></div>
+              <div class="bar" style="background:var(--teal)"></div>
+              <div class="bar" style="background:var(--teal)"></div>
+              <div class="bar" style="background:var(--teal)"></div>
+              <div class="bar" style="background:var(--teal)"></div>
+              <div class="bar" style="background:var(--teal)"></div>
+            </div>
+            <div class="watch-speech ai" style="font-size:10px">
+              "현관문 잠금 확인 후, '같이 거실에서 쉬자'고 말씀해보세요. 좋아하는 음악을 틀면 효과가 좋았어요."
+            </div>
+            <div class="watch-prompt">답변 →</div>
+          </div>
+        </div>
+        <div class="watch-caption">
+          <div class="watch-caption-title">맞춤형 음성 가이드</div>
+          <div class="watch-caption-desc">환자 개인 이력(좋아하는 음악, 과거 유효 대응) 반영한 맞춤 안내</div>
+        </div>
+      </div>
+
+      <!-- Watch 6: 후속 대화 -->
+      <div class="watch-wrap">
+        <div class="watch-frame glow-purple">
+          <div class="watch-badge badge-purple">후속 대화</div>
+          <div class="watch-title" style="color:var(--purple)">이어서 안내</div>
+          <div class="watch-body">
+            <div class="watch-speech">
+              "그래도 안 되면?"
+            </div>
+            <div class="watch-speech ai" style="font-size:10px">
+              "5분 기다려보시고, 좋아하시는 간식을 드려보세요. 그래도 안 되면 치매안심센터에 연결해드릴까요?"
+            </div>
+            <div class="watch-actions">
+              <div class="watch-btn watch-btn-primary">치매안심센터</div>
+              <div class="watch-btn watch-btn-secondary">나중에</div>
+            </div>
+          </div>
+        </div>
+        <div class="watch-caption">
+          <div class="watch-caption-title">연속 대화 지원</div>
+          <div class="watch-caption-desc">이전 맥락 유지. 단계적 에스컬레이션 + 외부 서비스 연결</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════ SECTION 3: 보호자 상태 모니터링 ════════ -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-flow">
+        보호자 상태 <span class="arrow">→</span> 번아웃 조기 감지
+      </div>
+      <p class="section-desc">스마트워치 센서로 보호자의 수면·스트레스를 추적하여 번아웃을 조기에 경고</p>
+    </div>
+
+    <div class="category-row">
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--blue)"></div>
+        <span style="color:var(--blue)">건강 데이터</span>
+      </div>
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--amber)"></div>
+        <span style="color:var(--amber)">번아웃 경고</span>
+      </div>
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--green)"></div>
+        <span style="color:var(--green)">서비스 연결</span>
+      </div>
+    </div>
+
+    <div class="watch-row">
+
+      <!-- Watch 7: 건강 데이터 -->
+      <div class="watch-wrap">
+        <div class="watch-frame">
+          <div class="watch-badge badge-blue">건강 데이터</div>
+          <div class="watch-title">오늘의 컨디션</div>
+          <div class="watch-subtitle">2026.06.02</div>
+          <div class="watch-body">
+            <div class="metric-row">
+              <span class="metric-label">수면</span>
+              <span class="metric-value danger">4.2시간</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">수면 품질</span>
+              <span class="metric-value danger">Poor</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">스트레스</span>
+              <span class="metric-value warn">82/100</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">심박수</span>
+              <span class="metric-value" style="color:var(--text)">78 bpm</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">HRV</span>
+              <span class="metric-value warn">28ms</span>
+            </div>
+            <div class="gauge-wrap">
+              <div class="gauge-bar">
+                <div class="gauge-fill" style="width:82%; background: linear-gradient(90deg, var(--amber), var(--red))"></div>
+              </div>
+              <div class="gauge-label">
+                <span>스트레스 지수</span>
+                <span style="color:var(--red)">높음</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="watch-caption">
+          <div class="watch-caption-title">PPG + 가속도계 수집</div>
+          <div class="watch-caption-desc">심박, HRV, 수면 시간/품질, 스트레스 지수를 실시간 추적</div>
+        </div>
+      </div>
+
+      <!-- Watch 8: 번아웃 경고 -->
+      <div class="watch-wrap">
+        <div class="watch-frame glow-amber">
+          <div class="watch-badge badge-amber">⚠ 번아웃 경고</div>
+          <div class="watch-title" style="color:var(--amber)">컨디션 알림</div>
+          <div class="watch-body">
+            <div class="watch-speech" style="border-left-color:var(--amber); background:var(--amber-bg); font-size:10px">
+              3일 연속 수면 5시간 미만이에요. 스트레스 지수가 높게 측정됐어요.
+            </div>
+            <div class="watch-speech ai" style="font-size:10px">
+              잠깐 쉬어가는 건 어떨까요? 근처 주간보호 서비스를 확인해보시겠어요?
+            </div>
+            <div class="watch-actions">
+              <div class="watch-btn watch-btn-primary">주간보호 알아보기</div>
+              <div class="watch-btn watch-btn-secondary">나중에</div>
+            </div>
+          </div>
+        </div>
+        <div class="watch-caption">
+          <div class="watch-caption-title">번아웃 조기 감지</div>
+          <div class="watch-caption-desc">수면 부족 3일 + 스트레스 75↑ = 번아웃 위험 경고 + 서비스 안내</div>
+        </div>
+      </div>
+
+      <!-- Watch 9: 서비스 연결 -->
+      <div class="watch-wrap">
+        <div class="watch-frame">
+          <div class="watch-badge badge-green">서비스 연결</div>
+          <div class="watch-title" style="color:var(--green)">근처 돌봄 서비스</div>
+          <div class="watch-body">
+            <div class="watch-speech ai" style="font-size:10px">
+              가장 가까운 주간보호센터를 찾아봤어요. 앱에서 상세 정보를 확인하시겠어요?
+            </div>
+            <div style="padding:6px 0; font-size:10px; color:var(--text-dim)">
+              <div style="display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.04)">
+                <span>○○구 주간보호</span><span style="color:var(--green)">1.2km</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.04)">
+                <span>△△ 데이케어</span><span style="color:var(--green)">2.4km</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:3px 0">
+                <span>치매안심센터</span><span style="color:var(--green)">0.8km</span>
+              </div>
+            </div>
+            <div class="watch-actions">
+              <div class="watch-btn watch-btn-primary">앱에서 보기</div>
+            </div>
+          </div>
+        </div>
+        <div class="watch-caption">
+          <div class="watch-caption-title">외부 서비스 안내</div>
+          <div class="watch-caption-desc">위치 기반 주간보호/방문요양/치매안심센터 검색 → 앱 연동</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════ SECTION 4: 기술 스택 ════════ -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-flow">
+        기술 스택 <span class="arrow">→</span> 워치 핵심 기술 요약
+      </div>
+    </div>
+
+    <div class="specs-grid">
+      <div class="spec-card">
+        <div class="spec-card-label">음성 입력</div>
+        <div class="spec-card-value" style="color:var(--teal)">온디바이스 STT</div>
+        <div class="spec-card-desc">Whisper Tiny / Apple Speech. 네트워크 지연 없이 워치에서 직접 변환</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-card-label">음성 출력</div>
+        <div class="spec-card-value" style="color:var(--teal)">Edge TTS</div>
+        <div class="spec-card-desc">자연스러운 한국어 음성으로 대응 가이드 안내</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-card-label">AI 대응 생성</div>
+        <div class="spec-card-value" style="color:var(--purple)">LLM + RAG</div>
+        <div class="spec-card-desc">환자 이력 + 전문가 가이드 DB 결합. 맞춤형 대응 생성</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-card-label">알림 전달</div>
+        <div class="spec-card-value" style="color:var(--red)">FCM / APNs</div>
+        <div class="spec-card-desc">긴급도별 차등 Push. 강한 햅틱~무음까지</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-card-label">건강 모니터링</div>
+        <div class="spec-card-value" style="color:var(--blue)">HealthKit / Samsung</div>
+        <div class="spec-card-desc">PPG 심박, HRV, 가속도계 수면 추적</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-card-label">디바이스 연결</div>
+        <div class="spec-card-value" style="color:var(--amber)">BLE + WebSocket</div>
+        <div class="spec-card-desc">폰 앱 BLE 동기화 + 음성 스트리밍 저지연 연결</div>
+      </div>
+    </div>
+
+    <div style="text-align:center; padding:40px 0 20px; color:var(--text-muted); font-size:12px">
+      스마트워치 인터랙션 목업 · Amicus Brain
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
