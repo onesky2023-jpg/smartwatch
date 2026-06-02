@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>모바일 앱 — 모니터링 + 데이터</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0B0B0F;
+  --card: #16161E;
+  --border: #2A2A35;
+  --text: #E8E6E3;
+  --text-dim: #8A8A95;
+  --text-muted: #55555F;
+  --red: #FF4D4F;
+  --red-bg: rgba(255,77,79,0.12);
+  --amber: #FAAD14;
+  --amber-bg: rgba(250,173,20,0.12);
+  --green: #52C41A;
+  --green-bg: rgba(82,196,26,0.12);
+  --teal: #13C2C2;
+  --teal-bg: rgba(19,194,194,0.12);
+  --purple: #9254DE;
+  --purple-bg: rgba(146,84,222,0.12);
+  --blue: #4096FF;
+  --blue-bg: rgba(64,150,255,0.12);
+  --phone-bg: #0D0D12;
+  --phone-border: #2E2E38;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ── Section ── */
+.section { padding: 56px 0; position: relative; }
+.section + .section { border-top: 1px solid var(--border); }
+.section-label { text-align: center; margin-bottom: 40px; }
+.section-flow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+}
+.section-flow .arrow { color: var(--teal); font-size: 16px; }
+.section-desc { font-size: 13px; color: var(--text-dim); margin-top: 8px; }
+
+/* ── Category labels ── */
+.category-row {
+  display: flex; justify-content: center; gap: 24px;
+  margin-bottom: 32px; flex-wrap: wrap;
+}
+.category-tag { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
+.category-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ── Phone grid ── */
+.phone-row {
+  display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; margin-bottom: 24px;
+}
+
+/* ── Phone frame ── */
+.phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.phone-frame {
+  width: 260px; height: 480px;
+  background: var(--phone-bg);
+  border: 2px solid var(--phone-border);
+  border-radius: 28px;
+  padding: 36px 14px 20px;
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+/* Notch */
+.phone-frame::before {
+  content: '';
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  width: 80px; height: 20px;
+  background: #000; border-radius: 0 0 12px 12px;
+  border: 1px solid var(--phone-border); border-top: none;
+}
+/* Status bar */
+.phone-status {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 9px; color: var(--text-muted);
+  margin-bottom: 10px; padding: 0 4px;
+}
+
+/* Glow variants */
+.phone-frame.glow-teal {
+  border-color: rgba(19,194,194,0.35);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 30px rgba(19,194,194,0.15);
+}
+.phone-frame.glow-blue {
+  border-color: rgba(64,150,255,0.35);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 30px rgba(64,150,255,0.15);
+}
+.phone-frame.glow-purple {
+  border-color: rgba(146,84,222,0.35);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 30px rgba(146,84,222,0.15);
+}
+.phone-frame.glow-green {
+  border-color: rgba(82,196,26,0.35);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 30px rgba(82,196,26,0.15);
+}
+.phone-frame.glow-amber {
+  border-color: rgba(250,173,20,0.35);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 30px rgba(250,173,20,0.15);
+}
+
+/* ── Phone inner elements ── */
+.phone-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px; padding: 0 2px;
+}
+.phone-header-title { font-size: 15px; font-weight: 700; }
+.phone-header-icon {
+  width: 24px; height: 24px; border-radius: 6px;
+  background: rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+}
+
+.phone-body { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+
+/* Badge */
+.p-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 12px;
+  font-size: 9px; font-weight: 700; align-self: flex-start;
+}
+.p-badge-red { background: var(--red-bg); color: var(--red); }
+.p-badge-amber { background: var(--amber-bg); color: var(--amber); }
+.p-badge-green { background: var(--green-bg); color: var(--green); }
+.p-badge-teal { background: var(--teal-bg); color: var(--teal); }
+.p-badge-blue { background: var(--blue-bg); color: var(--blue); }
+.p-badge-purple { background: var(--purple-bg); color: var(--purple); }
+
+/* Camera view */
+.cam-view {
+  width: 100%; height: 120px; border-radius: 10px;
+  background: linear-gradient(135deg, #1a1a28 0%, #0f0f18 100%);
+  border: 1px solid var(--border); position: relative; overflow: hidden;
+}
+.cam-view .live-dot {
+  position: absolute; top: 8px; right: 8px;
+  display: flex; align-items: center; gap: 4px;
+  font-size: 8px; font-weight: 700; color: var(--red);
+}
+.cam-view .live-dot::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--red); animation: blink 1.5s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.cam-view .cam-label {
+  position: absolute; bottom: 8px; left: 8px;
+  font-size: 9px; color: var(--text-dim);
+}
+.cam-view .ai-box {
+  position: absolute; top: 30px; left: 30px;
+  width: 60px; height: 70px; border: 1.5px solid var(--teal);
+  border-radius: 4px;
+}
+.cam-view .ai-box-label {
+  position: absolute; top: 26px; left: 32px;
+  font-size: 7px; color: var(--teal); font-weight: 600;
+  background: rgba(19,194,194,0.15); padding: 1px 4px; border-radius: 2px;
+}
+.cam-view .ai-status {
+  position: absolute; bottom: 8px; right: 8px;
+  font-size: 8px; padding: 2px 6px; border-radius: 4px;
+  font-weight: 600;
+}
+
+/* Cam tabs */
+.cam-tabs {
+  display: flex; gap: 6px;
+}
+.cam-tab {
+  flex: 1; padding: 6px 0; border-radius: 6px; text-align: center;
+  font-size: 9px; font-weight: 500; background: rgba(255,255,255,0.04);
+  color: var(--text-dim); border: 1px solid transparent;
+}
+.cam-tab.active { border-color: var(--teal); color: var(--teal); background: var(--teal-bg); }
+
+/* Cam actions */
+.cam-actions {
+  display: flex; gap: 8px; justify-content: center; padding: 4px 0;
+}
+.cam-action {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  font-size: 8px; color: var(--text-dim);
+}
+.cam-action-icon {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 13px;
+}
+
+/* Timeline */
+.tl-item {
+  display: flex; gap: 8px; align-items: flex-start;
+  padding: 6px 8px; border-radius: 8px;
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+}
+.tl-dot {
+  width: 8px; height: 8px; border-radius: 50%; margin-top: 3px; flex-shrink: 0;
+}
+.tl-content { flex: 1; }
+.tl-time { font-size: 9px; color: var(--text-muted); }
+.tl-title { font-size: 10px; font-weight: 600; margin-top: 1px; }
+.tl-desc { font-size: 9px; color: var(--text-dim); margin-top: 1px; }
+
+/* Event detail */
+.evt-section {
+  padding: 6px 8px; border-radius: 8px;
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+}
+.evt-section-title {
+  font-size: 9px; color: var(--text-muted); font-weight: 600;
+  margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.evt-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 2px 0; font-size: 10px;
+}
+.evt-label { color: var(--text-dim); }
+.evt-value { font-weight: 600; }
+
+/* Chart bars */
+.chart-bars { display: flex; align-items: flex-end; gap: 4px; height: 60px; padding: 0 4px; }
+.chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.chart-bar {
+  width: 100%; border-radius: 3px 3px 0 0; min-height: 4px;
+  transition: height 0.3s;
+}
+.chart-bar-label { font-size: 7px; color: var(--text-muted); }
+
+/* Stat row */
+.stat-row {
+  display: flex; gap: 6px;
+}
+.stat-card {
+  flex: 1; padding: 8px; border-radius: 8px;
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+  text-align: center;
+}
+.stat-number { font-size: 18px; font-weight: 900; }
+.stat-label { font-size: 8px; color: var(--text-dim); margin-top: 2px; }
+
+/* Profile card */
+.profile-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px; border-radius: 10px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+}
+.profile-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple), var(--blue));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.profile-info { flex: 1; }
+.profile-name { font-size: 12px; font-weight: 600; }
+.profile-detail { font-size: 9px; color: var(--text-dim); }
+
+/* Service list */
+.svc-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 7px 8px; border-radius: 8px;
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+}
+.svc-left { display: flex; align-items: center; gap: 8px; }
+.svc-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.svc-name { font-size: 10px; font-weight: 600; }
+.svc-sub { font-size: 8px; color: var(--text-dim); }
+.svc-dist { font-size: 9px; font-weight: 600; }
+
+/* Family member */
+.fam-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px; border-radius: 8px;
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+}
+.fam-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.fam-name { font-size: 10px; font-weight: 600; flex: 1; }
+.fam-role { font-size: 8px; color: var(--text-dim); }
+
+/* Phone bottom button */
+.phone-btn {
+  padding: 8px 0; border-radius: 8px; text-align: center;
+  font-size: 11px; font-weight: 600; cursor: pointer; margin-top: auto;
+}
+.phone-btn-primary { background: var(--teal); color: #000; }
+.phone-btn-outline {
+  background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+}
+
+/* Caption */
+.phone-caption { text-align: center; max-width: 240px; }
+.phone-caption-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.phone-caption-desc { font-size: 11px; color: var(--text-dim); line-height: 1.5; }
+
+/* ── Tech specs ── */
+.specs-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px; margin-top: 24px;
+}
+.spec-card {
+  padding: 16px; background: var(--card);
+  border-radius: 12px; border: 1px solid var(--border);
+}
+.spec-card-label {
+  font-size: 10px; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+}
+.spec-card-value { font-size: 13px; font-weight: 600; }
+.spec-card-desc { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container { padding: 0 16px; }
+  .phone-row { gap: 24px; }
+  .phone-frame { width: 230px; height: 440px; }
+  .specs-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section { animation: fadeInUp 0.6s ease-out; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ════════ SECTION 1: 실시간 모니터링 ════════ -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-flow">
+        실시간 모니터링 <span class="arrow">→</span> CCTV + 이벤트 타임라인
+      </div>
+      <p class="section-desc">카메라 영상을 실시간으로 확인하고, 하루 동안 발생한 이벤트를 시간순으로 추적</p>
+    </div>
+
+    <div class="category-row">
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--teal)"></div>
+        <span style="color:var(--teal)">실시간 영상</span>
+      </div>
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--blue)"></div>
+        <span style="color:var(--blue)">이벤트 타임라인</span>
+      </div>
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--red)"></div>
+        <span style="color:var(--red)">이벤트 상세</span>
+      </div>
+    </div>
+
+    <div class="phone-row">
+
+      <!-- Phone 1: CCTV 실시간 -->
+      <div class="phone-wrap">
+        <div class="phone-frame glow-teal">
+          <div class="phone-status">
+            <span>9:41</span>
+            <span>⌚ 연결됨</span>
+          </div>
+          <div class="phone-header">
+            <div class="phone-header-title" style="color:var(--teal)">실시간 모니터링</div>
+            <div class="phone-header-icon">⚙</div>
+          </div>
+          <div class="phone-body">
+            <div class="cam-view">
+              <div class="live-dot">LIVE</div>
+              <div class="ai-box"></div>
+              <div class="ai-box-label">환자</div>
+              <div class="cam-label">거실 카메라</div>
+              <div class="ai-status" style="background:var(--green-bg); color:var(--green)">😊 안정</div>
+            </div>
+            <div class="cam-tabs">
+              <div class="cam-tab active">거실</div>
+              <div class="cam-tab">현관</div>
+              <div class="cam-tab">안방</div>
+            </div>
+            <div class="cam-actions">
+              <div class="cam-action">
+                <div class="cam-action-icon">🔊</div>
+                <span>통화</span>
+              </div>
+              <div class="cam-action">
+                <div class="cam-action-icon">📸</div>
+                <span>캡처</span>
+              </div>
+              <div class="cam-action">
+                <div class="cam-action-icon">⏺</div>
+                <span>녹화</span>
+              </div>
+              <div class="cam-action">
+                <div class="cam-action-icon">🤖</div>
+                <span>AI</span>
+              </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 4px 0; border-top:1px solid rgba(255,255,255,0.04)">
+              <span style="font-size:9px; color:var(--text-dim)">자동 추적</span>
+              <div style="width:28px; height:16px; border-radius:8px; background:var(--teal); position:relative">
+                <div style="width:12px; height:12px; border-radius:50%; background:#fff; position:absolute; right:2px; top:2px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-caption">
+          <div class="phone-caption-title">CCTV 실시간 영상</div>
+          <div class="phone-caption-desc">멀티캠 전환, AI 오버레이, 환자 자동 추적 ON/OFF</div>
+        </div>
+      </div>
+
+      <!-- Phone 2: 이벤트 타임라인 -->
+      <div class="phone-wrap">
+        <div class="phone-frame glow-blue">
+          <div class="phone-status">
+            <span>9:41</span>
+            <span>6월 2일</span>
+          </div>
+          <div class="phone-header">
+            <div class="phone-header-title" style="color:var(--blue)">이벤트 타임라인</div>
+            <div class="phone-header-icon">📅</div>
+          </div>
+          <div class="phone-body">
+            <div style="display:flex; gap:4px; margin-bottom:4px">
+              <div class="p-badge p-badge-red">🔴 3</div>
+              <div class="p-badge p-badge-amber">🟡 8</div>
+              <div class="p-badge p-badge-green">🟢 12</div>
+            </div>
+
+            <div class="tl-item">
+              <div class="tl-dot" style="background:var(--red)"></div>
+              <div class="tl-content">
+                <div class="tl-time">22:30</div>
+                <div class="tl-title" style="color:var(--red)">배회 위험</div>
+                <div class="tl-desc">현관 · "집에 가야 돼" 반복 · 8분 후 진정 ✓</div>
+              </div>
+            </div>
+
+            <div class="tl-item">
+              <div class="tl-dot" style="background:var(--amber)"></div>
+              <div class="tl-content">
+                <div class="tl-time">14:30</div>
+                <div class="tl-title" style="color:var(--amber)">불안 증가</div>
+                <div class="tl-desc">보호자 호출 5회 반복</div>
+              </div>
+            </div>
+
+            <div class="tl-item">
+              <div class="tl-dot" style="background:var(--green)"></div>
+              <div class="tl-content">
+                <div class="tl-time">09:15</div>
+                <div class="tl-title">반복 질문</div>
+                <div class="tl-desc">"오늘 무슨 요일이야?" 2회</div>
+              </div>
+            </div>
+
+            <div class="tl-item">
+              <div class="tl-dot" style="background:var(--green)"></div>
+              <div class="tl-content">
+                <div class="tl-time">18:00</div>
+                <div class="tl-title">반복 질문</div>
+                <div class="tl-desc">"밥 먹었어?" 3회</div>
+              </div>
+            </div>
+
+            <div class="phone-btn phone-btn-outline" style="margin-top:auto">전체 이력 보기</div>
+          </div>
+        </div>
+        <div class="phone-caption">
+          <div class="phone-caption-title">하루 이벤트 기록</div>
+          <div class="phone-caption-desc">긴급도별 분류, 시간순 정렬, 대응 결과까지 한눈에</div>
+        </div>
+      </div>
+
+      <!-- Phone 3: 이벤트 상세 -->
+      <div class="phone-wrap">
+        <div class="phone-frame">
+          <div class="phone-status">
+            <span>22:38</span>
+            <span>← 돌아가기</span>
+          </div>
+          <div class="phone-header">
+            <div class="p-badge p-badge-red">🔴 즉시 대응</div>
+          </div>
+          <div class="phone-body">
+            <div style="font-size:16px; font-weight:700; color:var(--red)">배회 위험</div>
+            <div style="font-size:10px; color:var(--text-dim)">2026.06.02 22:30 · 현관</div>
+
+            <div class="cam-view" style="height:80px; margin-top:6px">
+              <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:20px">▶</div>
+              <div class="cam-label">영상 클립 (30초)</div>
+            </div>
+
+            <div class="evt-section">
+              <div class="evt-section-title">AI 분석</div>
+              <div class="evt-row">
+                <span class="evt-label">유형</span>
+                <span class="evt-value" style="color:var(--red)">배회</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">신뢰도</span>
+                <span class="evt-value">94%</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">트리거</span>
+                <span class="evt-value" style="font-size:9px">외출 관련 반복 발화</span>
+              </div>
+            </div>
+
+            <div class="evt-section">
+              <div class="evt-section-title">대응 이력</div>
+              <div class="evt-row">
+                <span class="evt-label">가이드</span>
+                <span class="evt-value" style="font-size:9px">배회 대응 #12</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">보호자 행동</span>
+                <span class="evt-value" style="font-size:9px">좋아하는 음악</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">해소 시간</span>
+                <span class="evt-value" style="color:var(--green)">8분</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">결과</span>
+                <span class="evt-value" style="color:var(--green)">진정됨 ✓</span>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:6px; margin-top:auto">
+              <div class="phone-btn phone-btn-primary" style="flex:1">의사에게 공유</div>
+              <div class="phone-btn phone-btn-outline" style="flex:1">메모 추가</div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-caption">
+          <div class="phone-caption-title">이벤트 상세 기록</div>
+          <div class="phone-caption-desc">당시 영상 클립, AI 분석 결과, 대응 이력을 모두 확인</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════ SECTION 2: 데이터 분석 ════════ -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-flow">
+        데이터 분석 <span class="arrow">→</span> 패턴 발견 + 주간 리포트
+      </div>
+      <p class="section-desc">축적된 이벤트 데이터로 행동 패턴과 변화 추이를 분석하고, 의료진 공유용 리포트를 생성</p>
+    </div>
+
+    <div class="category-row">
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--purple)"></div>
+        <span style="color:var(--purple)">통계 대시보드</span>
+      </div>
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--amber)"></div>
+        <span style="color:var(--amber)">주간 리포트</span>
+      </div>
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--teal)"></div>
+        <span style="color:var(--teal)">대응 효과 분석</span>
+      </div>
+    </div>
+
+    <div class="phone-row">
+
+      <!-- Phone 4: 통계 대시보드 -->
+      <div class="phone-wrap">
+        <div class="phone-frame glow-purple">
+          <div class="phone-status">
+            <span>9:41</span>
+            <span>이번 주</span>
+          </div>
+          <div class="phone-header">
+            <div class="phone-header-title" style="color:var(--purple)">통계 대시보드</div>
+            <div class="phone-header-icon">📊</div>
+          </div>
+          <div class="phone-body">
+            <div class="stat-row">
+              <div class="stat-card">
+                <div class="stat-number" style="color:var(--red)">3</div>
+                <div class="stat-label">즉시 대응</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number" style="color:var(--amber)">8</div>
+                <div class="stat-label">주의 관찰</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number" style="color:var(--green)">12</div>
+                <div class="stat-label">기록</div>
+              </div>
+            </div>
+
+            <div style="font-size:10px; font-weight:600; color:var(--text-dim); padding:4px 0 2px">BPSD 유형별 빈도</div>
+            <div class="chart-bars">
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:50px; background:var(--purple)"></div>
+                <div class="chart-bar-label">반복질문</div>
+              </div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:30px; background:var(--red)"></div>
+                <div class="chart-bar-label">배회</div>
+              </div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:22px; background:var(--amber)"></div>
+                <div class="chart-bar-label">불안</div>
+              </div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:18px; background:var(--blue)"></div>
+                <div class="chart-bar-label">수면</div>
+              </div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:12px; background:var(--teal)"></div>
+                <div class="chart-bar-label">공격성</div>
+              </div>
+            </div>
+
+            <div style="font-size:10px; font-weight:600; color:var(--text-dim); padding:4px 0 2px">피크 시간대</div>
+            <div style="display:flex; gap:6px">
+              <div class="p-badge p-badge-red" style="font-size:10px">22:00~02:00</div>
+              <div class="p-badge p-badge-amber" style="font-size:10px">17:00~19:00</div>
+            </div>
+
+            <div class="evt-section" style="margin-top:auto">
+              <div class="evt-row">
+                <span class="evt-label">주간 변화</span>
+                <span class="evt-value" style="color:var(--red); font-size:9px">야간 배회 ↑ 증가</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-caption">
+          <div class="phone-caption-title">BPSD 빈도 + 패턴</div>
+          <div class="phone-caption-desc">유형별 빈도, 피크 시간대, 주간 변화 추이 한눈에 확인</div>
+        </div>
+      </div>
+
+      <!-- Phone 5: 주간 리포트 -->
+      <div class="phone-wrap">
+        <div class="phone-frame glow-amber">
+          <div class="phone-status">
+            <span>9:41</span>
+            <span>W23</span>
+          </div>
+          <div class="phone-header">
+            <div class="phone-header-title" style="color:var(--amber)">주간 리포트</div>
+            <div class="phone-header-icon">📋</div>
+          </div>
+          <div class="phone-body">
+            <div style="font-size:10px; color:var(--text-dim); margin-bottom:6px">2026.06.01 ~ 06.07</div>
+
+            <div class="evt-section">
+              <div class="evt-section-title">요약</div>
+              <div class="evt-row">
+                <span class="evt-label">총 이벤트</span>
+                <span class="evt-value">23건</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">주요 BPSD</span>
+                <span class="evt-value" style="color:var(--purple)">반복질문 (9회)</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">피크 시간</span>
+                <span class="evt-value" style="font-size:9px">22시~02시</span>
+              </div>
+            </div>
+
+            <div class="evt-section">
+              <div class="evt-section-title">가장 효과적 대응</div>
+              <div class="evt-row">
+                <span class="evt-label">가이드</span>
+                <span class="evt-value" style="font-size:9px; color:var(--green)">음악 전환</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">성공률</span>
+                <span class="evt-value" style="color:var(--green)">72%</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">평균 해소</span>
+                <span class="evt-value">8분</span>
+              </div>
+            </div>
+
+            <div class="evt-section">
+              <div class="evt-section-title">보호자 컨디션</div>
+              <div class="evt-row">
+                <span class="evt-label">평균 수면</span>
+                <span class="evt-value" style="color:var(--red)">4.8시간</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">스트레스</span>
+                <span class="evt-value" style="color:var(--amber)">76/100</span>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:6px; margin-top:auto">
+              <div class="phone-btn phone-btn-primary" style="flex:1">PDF 내보내기</div>
+              <div class="phone-btn phone-btn-outline" style="flex:1">의사 전송</div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-caption">
+          <div class="phone-caption-title">의료진 공유 리포트</div>
+          <div class="phone-caption-desc">주간 요약, 효과적 대응 랭킹, 보호자 컨디션 → PDF/전송</div>
+        </div>
+      </div>
+
+      <!-- Phone 6: 대응 효과 분석 -->
+      <div class="phone-wrap">
+        <div class="phone-frame glow-teal">
+          <div class="phone-status">
+            <span>9:41</span>
+            <span>최근 30일</span>
+          </div>
+          <div class="phone-header">
+            <div class="phone-header-title" style="color:var(--teal)">대응 효과 분석</div>
+            <div class="phone-header-icon">🎯</div>
+          </div>
+          <div class="phone-body">
+            <div style="font-size:10px; font-weight:600; color:var(--text-dim); margin-bottom:4px">가이드별 성공률 랭킹</div>
+
+            <div class="evt-section">
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0">
+                <div>
+                  <div style="font-size:11px; font-weight:600">1. 좋아하는 음악 틀기</div>
+                  <div style="font-size:8px; color:var(--text-dim)">평균 해소 8분</div>
+                </div>
+                <span style="font-size:14px; font-weight:900; color:var(--green)">72%</span>
+              </div>
+              <div style="height:4px; background:rgba(255,255,255,0.06); border-radius:2px; margin:2px 0 6px">
+                <div style="height:100%; width:72%; background:var(--green); border-radius:2px"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0">
+                <div>
+                  <div style="font-size:11px; font-weight:600">2. 간식 제공</div>
+                  <div style="font-size:8px; color:var(--text-dim)">평균 해소 12분</div>
+                </div>
+                <span style="font-size:14px; font-weight:900; color:var(--amber)">58%</span>
+              </div>
+              <div style="height:4px; background:rgba(255,255,255,0.06); border-radius:2px; margin:2px 0 6px">
+                <div style="height:100%; width:58%; background:var(--amber); border-radius:2px"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0">
+                <div>
+                  <div style="font-size:11px; font-weight:600">3. 손주 사진 보여주기</div>
+                  <div style="font-size:8px; color:var(--text-dim)">평균 해소 15분</div>
+                </div>
+                <span style="font-size:14px; font-weight:900; color:var(--amber)">45%</span>
+              </div>
+              <div style="height:4px; background:rgba(255,255,255,0.06); border-radius:2px; margin:2px 0">
+                <div style="height:100%; width:45%; background:var(--amber); border-radius:2px"></div>
+              </div>
+            </div>
+
+            <div style="font-size:10px; font-weight:600; color:var(--text-dim); margin:6px 0 4px">월별 이벤트 추이</div>
+            <div class="chart-bars" style="height:40px">
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:20px; background:var(--blue)"></div>
+                <div class="chart-bar-label">3월</div>
+              </div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:24px; background:var(--blue)"></div>
+                <div class="chart-bar-label">4월</div>
+              </div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:30px; background:var(--amber)"></div>
+                <div class="chart-bar-label">5월</div>
+              </div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:38px; background:var(--red)"></div>
+                <div class="chart-bar-label">6월</div>
+              </div>
+            </div>
+
+            <div class="evt-section" style="margin-top:auto">
+              <div class="evt-row">
+                <span class="evt-label">추세</span>
+                <span class="evt-value" style="color:var(--red); font-size:9px">이벤트 증가 추세 ↑</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-caption">
+          <div class="phone-caption-title">AI 학습 기반 분석</div>
+          <div class="phone-caption-desc">어떤 대응이 효과적인지 데이터로 확인, 월별 추이 추적</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════ SECTION 3: 서비스 연결 + 가족 공유 ════════ -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-flow">
+        서비스 연결 <span class="arrow">→</span> 환자 관리 + 돌봄 서비스 + 가족 공유
+      </div>
+      <p class="section-desc">환자 프로필로 AI 정확도를 높이고, 위치 기반 돌봄 서비스 연결과 가족 간 정보 공유</p>
+    </div>
+
+    <div class="category-row">
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--purple)"></div>
+        <span style="color:var(--purple)">환자 프로필</span>
+      </div>
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--green)"></div>
+        <span style="color:var(--green)">돌봄 서비스</span>
+      </div>
+      <div class="category-tag">
+        <div class="category-dot" style="background:var(--blue)"></div>
+        <span style="color:var(--blue)">가족 공유</span>
+      </div>
+    </div>
+
+    <div class="phone-row">
+
+      <!-- Phone 7: 환자 프로필 -->
+      <div class="phone-wrap">
+        <div class="phone-frame glow-purple">
+          <div class="phone-status">
+            <span>9:41</span>
+            <span>편집</span>
+          </div>
+          <div class="phone-header">
+            <div class="phone-header-title" style="color:var(--purple)">환자 프로필</div>
+            <div class="phone-header-icon">✏️</div>
+          </div>
+          <div class="phone-body">
+            <div class="profile-row">
+              <div class="profile-avatar">김</div>
+              <div class="profile-info">
+                <div class="profile-name">김○○</div>
+                <div class="profile-detail">78세 · 여성 · 알츠하이머형 중기</div>
+              </div>
+            </div>
+
+            <div class="evt-section">
+              <div class="evt-section-title">진단 정보</div>
+              <div class="evt-row">
+                <span class="evt-label">장기요양</span>
+                <span class="evt-value">3등급</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">투약</span>
+                <span class="evt-value" style="font-size:9px">도네페질 10mg</span>
+              </div>
+            </div>
+
+            <div class="evt-section">
+              <div class="evt-section-title">AI 개인화 정보</div>
+              <div class="evt-row">
+                <span class="evt-label">좋아하는 음악</span>
+                <span class="evt-value" style="font-size:9px">트로트, 가곡</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">좋아하는 음식</span>
+                <span class="evt-value" style="font-size:9px">단팥죽, 식혜</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">안정 화제</span>
+                <span class="evt-value" style="font-size:9px">손주, 고향</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">트리거</span>
+                <span class="evt-value" style="font-size:9px; color:var(--amber)">해질녘, 낯선 소리</span>
+              </div>
+            </div>
+
+            <div style="padding:6px 8px; border-radius:8px; background:var(--teal-bg); border:1px solid rgba(19,194,194,0.2); font-size:9px; color:var(--teal); margin-top:auto">
+              💡 이 정보가 음성 AI 대응 가이드에 반영됩니다
+            </div>
+          </div>
+        </div>
+        <div class="phone-caption">
+          <div class="phone-caption-title">AI 맞춤화 프로필</div>
+          <div class="phone-caption-desc">환자 특성이 LLM 프롬프트에 반영되어 개인화된 대응 생성</div>
+        </div>
+      </div>
+
+      <!-- Phone 8: 돌봄 서비스 -->
+      <div class="phone-wrap">
+        <div class="phone-frame glow-green">
+          <div class="phone-status">
+            <span>9:41</span>
+            <span>📍 서울 ○○구</span>
+          </div>
+          <div class="phone-header">
+            <div class="phone-header-title" style="color:var(--green)">돌봄 서비스</div>
+            <div class="phone-header-icon">🗺</div>
+          </div>
+          <div class="phone-body">
+            <div style="height:70px; border-radius:10px; background:linear-gradient(135deg, #1a2a1a 0%, #0f180f 100%); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--text-dim); margin-bottom:4px">
+              🗺 지도 영역 (반경 5km)
+            </div>
+
+            <div class="svc-item">
+              <div class="svc-left">
+                <div class="svc-icon" style="background:var(--green-bg)">🏥</div>
+                <div>
+                  <div class="svc-name">○○구 치매안심센터</div>
+                  <div class="svc-sub">상담 · 검진 · 프로그램</div>
+                </div>
+              </div>
+              <div class="svc-dist" style="color:var(--green)">0.8km</div>
+            </div>
+
+            <div class="svc-item">
+              <div class="svc-left">
+                <div class="svc-icon" style="background:var(--blue-bg)">🏠</div>
+                <div>
+                  <div class="svc-name">△△ 주간보호센터</div>
+                  <div class="svc-sub">주간 돌봄 · 빈자리 2</div>
+                </div>
+              </div>
+              <div class="svc-dist" style="color:var(--blue)">1.2km</div>
+            </div>
+
+            <div class="svc-item">
+              <div class="svc-left">
+                <div class="svc-icon" style="background:var(--purple-bg)">👩‍⚕</div>
+                <div>
+                  <div class="svc-name">□□ 방문요양</div>
+                  <div class="svc-sub">요양보호사 방문</div>
+                </div>
+              </div>
+              <div class="svc-dist" style="color:var(--purple)">2.1km</div>
+            </div>
+
+            <div class="evt-section" style="margin-top:auto">
+              <div class="evt-section-title">장기요양 잔여 한도</div>
+              <div class="evt-row">
+                <span class="evt-label">이번 달 사용</span>
+                <span class="evt-value" style="font-size:9px">₩480,000</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">잔여</span>
+                <span class="evt-value" style="color:var(--green); font-size:9px">₩720,000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-caption">
+          <div class="phone-caption-title">위치 기반 서비스 검색</div>
+          <div class="phone-caption-desc">치매안심센터, 주간보호, 방문요양 + 장기요양보험 한도 조회</div>
+        </div>
+      </div>
+
+      <!-- Phone 9: 가족 공유 -->
+      <div class="phone-wrap">
+        <div class="phone-frame glow-blue">
+          <div class="phone-status">
+            <span>9:41</span>
+            <span>가족 3명</span>
+          </div>
+          <div class="phone-header">
+            <div class="phone-header-title" style="color:var(--blue)">가족 공유</div>
+            <div class="phone-header-icon">👨‍👩‍👧</div>
+          </div>
+          <div class="phone-body">
+
+            <div class="fam-item">
+              <div class="fam-avatar" style="background:linear-gradient(135deg, var(--teal), var(--blue))">김</div>
+              <div class="fam-name">김△△ <span style="font-size:8px; color:var(--teal)">(주 보호자)</span></div>
+              <div class="fam-role">모든 권한</div>
+            </div>
+            <div class="fam-item">
+              <div class="fam-avatar" style="background:linear-gradient(135deg, var(--purple), var(--blue))">김</div>
+              <div class="fam-name">김□□</div>
+              <div class="fam-role">영상 · 이력 · 통계</div>
+            </div>
+            <div class="fam-item">
+              <div class="fam-avatar" style="background:linear-gradient(135deg, var(--amber), var(--red))">이</div>
+              <div class="fam-name">이○○</div>
+              <div class="fam-role">이력 · 통계</div>
+            </div>
+
+            <div style="font-size:10px; font-weight:600; color:var(--text-dim); margin-top:8px">알림 설정</div>
+            <div class="evt-section">
+              <div class="evt-row">
+                <span class="evt-label">🔴 즉시 대응</span>
+                <span class="evt-value" style="font-size:9px; color:var(--red)">전원 알림</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">🟡 주의 관찰</span>
+                <span class="evt-value" style="font-size:9px; color:var(--amber)">주 보호자 + 김□□</span>
+              </div>
+              <div class="evt-row">
+                <span class="evt-label">🟢 기록용</span>
+                <span class="evt-value" style="font-size:9px">주 보호자만</span>
+              </div>
+            </div>
+
+            <div style="padding:6px 8px; border-radius:8px; background:var(--blue-bg); border:1px solid rgba(64,150,255,0.2); font-size:9px; color:var(--blue); margin-top:auto">
+              🔴 즉시 대응 시 가족 전원에게 동시 Push 알림
+            </div>
+
+            <div class="phone-btn phone-btn-primary" style="margin-top:8px">가족 초대하기</div>
+          </div>
+        </div>
+        <div class="phone-caption">
+          <div class="phone-caption-title">가족 역할 분담</div>
+          <div class="phone-caption-desc">권한별 접근, 긴급도별 알림 분배, 가족 간 상황 공유</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════ SECTION 4: 기술 스택 ════════ -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-flow">
+        기술 스택 <span class="arrow">→</span> 앱 핵심 기술 요약
+      </div>
+    </div>
+
+    <div class="specs-grid">
+      <div class="spec-card">
+        <div class="spec-card-label">크로스 플랫폼</div>
+        <div class="spec-card-value" style="color:var(--teal)">React Native / Flutter</div>
+        <div class="spec-card-desc">iOS + Android 동시 지원, 단일 코드베이스</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-card-label">실시간 영상</div>
+        <div class="spec-card-value" style="color:var(--blue)">WebRTC / HLS</div>
+        <div class="spec-card-desc">저지연 CCTV 스트리밍, 멀티캠 동시 지원</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-card-label">데이터 저장</div>
+        <div class="spec-card-value" style="color:var(--purple)">PostgreSQL + S3</div>
+        <div class="spec-card-desc">구조화 이벤트 데이터 + 영상/이미지 미디어 파일</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-card-label">위치 서비스</div>
+        <div class="spec-card-value" style="color:var(--green)">Kakao Map API</div>
+        <div class="spec-card-desc">근처 돌봄 서비스 검색, 거리 계산</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-card-label">가족 동기화</div>
+        <div class="spec-card-value" style="color:var(--amber)">Firebase Realtime DB</div>
+        <div class="spec-card-desc">가족 그룹 실시간 상태 동기화 + Push 알림</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-card-label">보험 연계</div>
+        <div class="spec-card-value" style="color:var(--red)">국민건강보험공단</div>
+        <div class="spec-card-desc">장기요양 등급/한도 조회 API 연동 (검토 중)</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
