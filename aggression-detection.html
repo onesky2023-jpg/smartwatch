@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공격적 행동 탐지 파이프라인 — Amicus Brain</title>
+<style>
+  :root{--bg:#ffffff;--bg2:#f5f5f4;--bg3:#ededec;--tx:#1a1a1a;--tx2:#6b6b6b;--tx3:#9b9b9b;--bd:#e0e0de;--blue:#2563eb;--blue-bg:#eff6ff;--green:#0f6e56;--green-bg:#e1f5ee;--amber:#854f0b;--amber-bg:#faeeda;--red:#a32d2d;--red-bg:#fcebeb;--red-strong:#e24b4a;--darkred:#791f1f;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  @media(prefers-color-scheme:dark){:root{--bg:#1a1a1a;--bg2:#262626;--bg3:#333;--tx:#e5e5e5;--tx2:#a0a0a0;--tx3:#707070;--bd:#404040;--blue:#60a5fa;--blue-bg:#1e3a5f;--green:#5dcaa5;--green-bg:#0a3d2e;--amber:#f0997b;--amber-bg:#4a2a10;--red:#f09595;--red-bg:#501313;--red-strong:#e24b4a;--darkred:#f09595}}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font);background:var(--bg);color:var(--tx);padding:16px;max-width:720px;margin:0 auto;font-size:14px;line-height:1.6}
+  h2{font-size:16px;font-weight:600;margin:0 0 12px}
+  .wrap{position:relative;width:100%;aspect-ratio:680/420;margin:0 0 10px;background:var(--bg);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+  .wrap svg{width:100%;height:100%}
+  .step-row{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap}
+  .sb{padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);transition:all .15s;user-select:none;font-family:var(--font)}
+  .sb:hover{border-color:var(--tx3)}.sb.on{background:var(--red-bg);color:var(--red);border-color:var(--red);font-weight:600}.sb.safe{background:var(--green-bg);color:var(--green);border-color:var(--green);font-weight:600}
+  .ip{padding:12px 14px;border-radius:8px;border:1px solid var(--bd);background:var(--bg2);font-size:13px;line-height:1.7;color:var(--tx2);min-height:54px}
+  .ip b{color:var(--tx);font-weight:600}
+  .pr{display:flex;gap:5px;align-items:center;margin:10px 0 8px;flex-wrap:wrap}
+  .pn{padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid var(--bd);background:var(--bg);color:var(--tx3);transition:all .2s;white-space:nowrap}
+  .pn.lit{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+  .pn.warn{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+  .pn.alert{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+  .pa{color:var(--tx3);font-size:11px}.pa.lit{color:var(--blue)}.pa.warn{color:var(--amber)}.pa.alert{color:var(--red)}
+  .lg{display:flex;gap:14px;font-size:11px;color:var(--tx3);margin:4px 0 8px;flex-wrap:wrap}
+  .ld{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:3px;vertical-align:-1px}
+  .dual{display:flex;gap:10px;margin:8px 0;flex-wrap:wrap}
+  .ch{flex:1;min-width:180px;padding:8px 12px;border-radius:6px;border:1px solid var(--bd);background:var(--bg);font-size:12px;transition:all .2s}
+  .ch .ct{font-weight:600;font-size:11px;margin-bottom:4px;color:var(--tx2)}
+  .ch .cb{height:6px;border-radius:3px;background:var(--bg3);margin:4px 0;overflow:hidden}
+  .ch .cf{height:100%;border-radius:3px;transition:width .3s,background .3s}
+  .ch .cl{font-size:11px;color:var(--tx3)}
+  .ch.active{border-color:var(--blue)}.ch.alert{border-color:var(--red)}
+  .mr{display:flex;gap:8px;margin:8px 0 10px;flex-wrap:wrap}
+  .mc{padding:7px 11px;border-radius:6px;background:var(--bg2);border:1px solid var(--bd);font-size:11px;color:var(--tx2);transition:all .2s;flex:1;min-width:85px}
+  .mc .v{font-size:15px;font-weight:600;color:var(--tx);margin-top:2px;transition:color .2s}
+  .mc.warn .v{color:var(--amber)}.mc.alert .v{color:var(--red)}
+</style>
+</head>
+<body>
+<h2>공격적 행동(Aggression) 탐지 파이프라인</h2>
+
+<div class="wrap">
+  <svg viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+    </defs>
+    <rect x="40" y="20" width="600" height="380" rx="4" fill="none" stroke="var(--tx3)" stroke-width="0.5" stroke-dasharray="6 3"/>
+    <text x="52" y="40" fill="var(--tx3)" font-size="12" font-family="var(--font)">카메라 뷰</text>
+
+    <g id="skel">
+      <circle id="k-head" cx="220" cy="90" r="10" fill="none" stroke="#1D9E75" stroke-width="2"/>
+      <circle id="k-neck" cx="220" cy="115" r="3" fill="#1D9E75"/>
+      <circle id="k-lsh" cx="190" cy="130" r="3" fill="#1D9E75"/>
+      <circle id="k-rsh" cx="250" cy="130" r="3" fill="#1D9E75"/>
+      <circle id="k-lel" cx="175" cy="175" r="3" fill="#1D9E75"/>
+      <circle id="k-rel" cx="265" cy="175" r="3" fill="#1D9E75"/>
+      <circle id="k-lwr" cx="168" cy="220" r="3" fill="#1D9E75"/>
+      <circle id="k-rwr" cx="272" cy="220" r="3" fill="#1D9E75"/>
+      <circle id="k-lhip" cx="200" cy="220" r="3" fill="#1D9E75"/>
+      <circle id="k-rhip" cx="240" cy="220" r="3" fill="#1D9E75"/>
+      <circle id="k-lkn" cx="195" cy="270" r="3" fill="#1D9E75"/>
+      <circle id="k-rkn" cx="245" cy="270" r="3" fill="#1D9E75"/>
+      <circle id="k-lan" cx="192" cy="320" r="3" fill="#1D9E75"/>
+      <circle id="k-ran" cx="248" cy="320" r="3" fill="#1D9E75"/>
+      <line id="b-sp" x1="220" y1="100" x2="220" y2="115" stroke="#1D9E75" stroke-width="1.5"/>
+      <line id="b-la1" x1="220" y1="115" x2="190" y2="130" stroke="#1D9E75" stroke-width="1.5"/>
+      <line id="b-ra1" x1="220" y1="115" x2="250" y2="130" stroke="#1D9E75" stroke-width="1.5"/>
+      <line id="b-la2" x1="190" y1="130" x2="175" y2="175" stroke="#1D9E75" stroke-width="1.5"/>
+      <line id="b-ra2" x1="250" y1="130" x2="265" y2="175" stroke="#1D9E75" stroke-width="1.5"/>
+      <line id="b-la3" x1="175" y1="175" x2="168" y2="220" stroke="#1D9E75" stroke-width="1.5"/>
+      <line id="b-ra3" x1="265" y1="175" x2="272" y2="220" stroke="#1D9E75" stroke-width="1.5"/>
+      <line id="b-t1" x1="220" y1="115" x2="200" y2="220" stroke="#1D9E75" stroke-width="1.5"/>
+      <line id="b-t2" x1="220" y1="115" x2="240" y2="220" stroke="#1D9E75" stroke-width="1.5"/>
+      <line id="b-ll1" x1="200" y1="220" x2="195" y2="270" stroke="#1D9E75" stroke-width="1.5"/>
+      <line id="b-rl1" x1="240" y1="220" x2="245" y2="270" stroke="#1D9E75" stroke-width="1.5"/>
+      <line id="b-ll2" x1="195" y1="270" x2="192" y2="320" stroke="#1D9E75" stroke-width="1.5"/>
+      <line id="b-rl2" x1="245" y1="270" x2="248" y2="320" stroke="#1D9E75" stroke-width="1.5"/>
+      <line id="b-hp" x1="200" y1="220" x2="240" y2="220" stroke="#1D9E75" stroke-width="1.5"/>
+      <line id="b-sh" x1="190" y1="130" x2="250" y2="130" stroke="#1D9E75" stroke-width="1.5"/>
+    </g>
+
+    <path id="trail-r" d="" fill="none" stroke="var(--red-strong)" stroke-width="1.5" stroke-dasharray="4 3" opacity="0"/>
+    <g id="vel-arr" opacity="0">
+      <line id="va-line" x1="272" y1="175" x2="320" y2="130" stroke="var(--red-strong)" stroke-width="2" marker-end="url(#arr)"/>
+      <text id="va-txt" x="325" y="125" fill="var(--red-strong)" font-size="12" font-family="var(--font)">480 px/s</text>
+    </g>
+
+    <g id="aw-panel" opacity="0">
+      <rect x="476" y="70" width="160" height="60" rx="6" fill="var(--bg2)" stroke="var(--bd)" stroke-width="0.5"/>
+      <text id="aw-lbl" x="556" y="86" text-anchor="middle" fill="var(--tx2)" font-size="11" font-weight="600" font-family="var(--font)">오디오 분석</text>
+      <g id="aw-bars" transform="translate(486,105)"></g>
+    </g>
+
+    <g id="fp" opacity="0">
+      <rect x="430" y="200" width="210" height="150" rx="8" fill="var(--bg2)" stroke="var(--bd)" stroke-width="0.5"/>
+      <text id="fp-t" x="450" y="226" fill="var(--amber)" font-size="14" font-weight="600" font-family="var(--font)"></text>
+      <text id="fp1" x="450" y="248" fill="var(--tx2)" font-size="12" font-family="var(--font)"></text>
+      <text id="fp2" x="450" y="268" fill="var(--tx2)" font-size="12" font-family="var(--font)"></text>
+      <text id="fp3" x="450" y="288" fill="var(--tx2)" font-size="12" font-family="var(--font)"></text>
+      <text id="fp4" x="450" y="308" fill="var(--tx2)" font-size="12" font-family="var(--font)"></text>
+      <text id="fp5" x="450" y="328" fill="var(--tx2)" font-size="12" font-family="var(--font)"></text>
+    </g>
+
+    <g id="block-badge" opacity="0">
+      <rect x="430" y="360" width="210" height="34" rx="8" fill="var(--darkred)" opacity="0.92"/>
+      <text x="535" y="382" text-anchor="middle" fill="#fff" font-size="12" font-weight="600" font-family="var(--font)">🚫 AI 음성 개입 차단됨</text>
+    </g>
+
+    <rect id="bbox" x="0" y="0" width="0" height="0" rx="2" fill="none" stroke="none" stroke-width="1.5"/>
+  </svg>
+</div>
+
+<div class="lg">
+  <span><span class="ld" style="background:#1D9E75"></span>정상</span>
+  <span><span class="ld" style="background:#BA7517"></span>이상 징후</span>
+  <span><span class="ld" style="background:#E24B4A"></span>공격 행동</span>
+  <span><span class="ld" style="background:var(--darkred)"></span>AI 개입 차단</span>
+</div>
+
+<div class="dual">
+  <div class="ch" id="ch-v"><div class="ct">👁 비전 채널</div><div class="cb"><div class="cf" id="cv-f" style="width:10%;background:var(--green)"></div></div><div class="cl" id="cv-l">동작 강도: 낮음</div></div>
+  <div class="ch" id="ch-a"><div class="ct">🔊 오디오 채널</div><div class="cb"><div class="cf" id="ca-f" style="width:5%;background:var(--green)"></div></div><div class="cl" id="ca-l">음량: 정상 대화</div></div>
+</div>
+
+<div class="mr">
+  <div class="mc" id="m0"><span>팔 속도</span><div class="v" id="v0">12 px/s</div></div>
+  <div class="mc" id="m1"><span>전신 가속도</span><div class="v" id="v1">낮음</div></div>
+  <div class="mc" id="m2"><span>음성 분류</span><div class="v" id="v2">대화</div></div>
+  <div class="mc" id="m3"><span>융합 판정</span><div class="v" id="v3">정상</div></div>
+</div>
+
+<div class="pr">
+  <span class="pn" id="p0">카메라+마이크</span><span class="pa" id="a0">→</span>
+  <span class="pn" id="p1">Pose+YAMNet</span><span class="pa" id="a1">→</span>
+  <span class="pn" id="p2">동작 분류</span><span class="pa" id="a2">→</span>
+  <span class="pn" id="p3">멀티모달 융합</span><span class="pa" id="a3">→</span>
+  <span class="pn" id="p4">알림(개입 차단)</span>
+</div>
+
+<div class="step-row">
+  <button class="sb safe" onclick="go(0)">1. 평상시</button>
+  <button class="sb" onclick="go(1)">2. 듀얼 추적</button>
+  <button class="sb" onclick="go(2)">3. 급격한 팔 동작</button>
+  <button class="sb" onclick="go(3)">4. 고함 감지</button>
+  <button class="sb" onclick="go(4)">5. 공격 확정</button>
+  <button class="sb" onclick="go(5)">6. 알림+개입 차단</button>
+</div>
+
+<div class="ip" id="info">
+  <b>평상시</b> — 환자가 서 있는 상태. 팔 동작 속도와 전신 가속도 모두 정상 범위. 오디오 채널에서 일반 대화 수준의 음량 감지.
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const KP={
+  normal:{head:[220,90],neck:[220,115],lsh:[190,130],rsh:[250,130],lel:[175,175],rel:[265,175],lwr:[168,220],rwr:[272,220],lhip:[200,220],rhip:[240,220],lkn:[195,270],rkn:[245,270],lan:[192,320],ran:[248,320]},
+  swing:{head:[215,85],neck:[218,110],lsh:[188,125],rsh:[248,125],lel:[170,155],rel:[295,105],lwr:[162,180],rwr:[330,80],lhip:[198,218],rhip:[238,218],lkn:[193,268],rkn:[243,268],lan:[190,318],ran:[246,318]},
+  shout:{head:[210,80],neck:[215,108],lsh:[185,122],rsh:[248,118],lel:[165,148],rel:[300,95],lwr:[155,170],rwr:[340,68],lhip:[196,216],rhip:[236,216],lkn:[192,266],rkn:[242,266],lan:[189,316],ran:[245,316]},
+  aggro:{head:[205,78],neck:[212,105],lsh:[182,118],rsh:[248,112],lel:[158,140],rel:[310,85],lwr:[148,158],rwr:[350,58],lhip:[195,214],rhip:[238,214],lkn:[190,264],rkn:[244,264],lan:[188,316],ran:[247,316]}
+};
+const ids=['head','neck','lsh','rsh','lel','rel','lwr','rwr','lhip','rhip','lkn','rkn','lan','ran'];
+const bn=[['sp','head','neck'],['la1','neck','lsh'],['ra1','neck','rsh'],['la2','lsh','lel'],['ra2','rsh','rel'],['la3','lel','lwr'],['ra3','rel','rwr'],['t1','neck','lhip'],['t2','neck','rhip'],['ll1','lhip','lkn'],['rl1','rhip','rkn'],['ll2','lkn','lan'],['rl2','rkn','ran'],['hp','lhip','rhip'],['sh','lsh','rsh']];
+const clr={normal:'#1D9E75',swing:'#BA7517',shout:'#BA7517',aggro:'#E24B4A'};
+
+function setSkel(p,c){
+  const d=KP[p];
+  ids.forEach(id=>{const e=$('k-'+id);e.setAttribute('cx',d[id][0]);e.setAttribute('cy',d[id][1]);e.setAttribute(id==='head'?'stroke':'fill',c);if(id==='head')e.setAttribute('fill','none');});
+  bn.forEach(b=>{const e=$('b-'+b[0]),p1=d[b[1]],p2=d[b[2]];e.setAttribute('x1',p1[0]);e.setAttribute('y1',b[0]==='sp'?p1[1]+10:p1[1]);e.setAttribute('x2',p2[0]);e.setAttribute('y2',p2[1]);e.setAttribute('stroke',c);});
+}
+function setBB(p,c,show){
+  if(!show){$('bbox').setAttribute('stroke','none');return;}
+  const d=KP[p],xs=ids.map(k=>d[k][0]),ys=ids.map(k=>d[k][1]);
+  const mx=Math.min(...xs)-15,my=Math.min(...ys)-15,Mx=Math.max(...xs)+15,My=Math.max(...ys)+15;
+  $('bbox').setAttribute('x',mx);$('bbox').setAttribute('y',my);$('bbox').setAttribute('width',Mx-mx);$('bbox').setAttribute('height',My-my);$('bbox').setAttribute('stroke',c);$('bbox').setAttribute('stroke-width','1.5');
+}
+function setAW(vals,color){
+  const g=$('aw-bars');g.innerHTML='';
+  vals.forEach((v,i)=>{
+    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',i*10);l.setAttribute('y1',-v);l.setAttribute('x2',i*10);l.setAttribute('y2',v);
+    l.setAttribute('stroke',color);l.setAttribute('stroke-width','2');l.setAttribute('stroke-linecap','round');
+    g.appendChild(l);
+  });
+}
+const awN=[3,5,4,6,3,5,7,4,5,3,6,4,5,3,4];
+const awL=[8,14,18,12,16,20,14,18,22,16,20,14,18,15,12];
+const awS=[12,20,24,18,22,25,20,24,22,18,24,20,22,18,14];
+
+const S=[
+  {p:'normal',bb:false,trail:'',va:false,aw:false,fp:false,block:false,
+   pipe:[],pw:[],pa2:[],
+   vals:['12 px/s','낮음','대화','정상'],mc:['','','',''],
+   vb:10,vc:'var(--green)',vl:'동작 강도: 낮음',vcl:'',ab:5,ac:'var(--green)',al:'음량: 정상 대화',acl:'',
+   awV:awN,awC:'#1D9E75',awL:'오디오 분석',
+   fpt:'',fpv:['','','','',''],fpc:'',
+   t:'<b>평상시</b> — 환자가 서 있는 상태. 팔 동작 속도와 전신 가속도 모두 정상 범위. 오디오 채널에서 일반 대화 수준의 음량 감지.'},
+  {p:'normal',bb:true,trail:'',va:false,aw:true,fp:false,block:false,
+   pipe:[0,1],pw:[],pa2:[],
+   vals:['12 px/s','낮음','대화','정상'],mc:['','','',''],
+   vb:10,vc:'var(--green)',vl:'동작 강도: 낮음',vcl:'active',ab:5,ac:'var(--green)',al:'음량: 정상 대화',acl:'active',
+   awV:awN,awC:'#1D9E75',awL:'YAMNet 분석 중',
+   fpt:'',fpv:['','','','',''],fpc:'',
+   t:'<b>듀얼 채널 추적</b> — 비전: YOLOv8-Pose가 키포인트 추적 + 속도 벡터 계산. 오디오: YAMNet이 환경 소리를 521개 클래스로 분류 중. 두 채널이 <b>독립 병렬 실행</b>.'},
+  {p:'swing',bb:true,trail:'M272,220 Q310,180 330,80',va:true,aw:true,fp:false,block:false,
+   pipe:[0,1,2],pw:[2],pa2:[],
+   vals:['480 px/s','중간','대화','관찰 중'],mc:['warn','warn','','warn'],
+   vb:65,vc:'var(--amber)',vl:'동작 강도: 급증',vcl:'active',ab:8,ac:'var(--green)',al:'음량: 정상',acl:'active',
+   awV:awN,awC:'#1D9E75',awL:'YAMNet: 정상',vaX2:330,vaY2:60,vaTxt:'480 px/s',
+   fpt:'',fpv:['','','','',''],fpc:'',
+   t:'<b>급격한 팔 동작</b> — 오른팔 손목 속도 480px/s (임계: 300px/s). 모션 트레일이 타격 패턴과 유사. 단, 비전 단독으로는 판정 불가 — <b>오디오 확인 대기</b>.'},
+  {p:'shout',bb:true,trail:'M272,175 Q320,110 340,68',va:true,aw:true,fp:true,block:false,
+   pipe:[0,1,2,3],pw:[],pa2:[3],
+   vals:['520 px/s','높음','고함','공격 의심'],mc:['alert','alert','alert','warn'],
+   vb:80,vc:'var(--red-strong)',vl:'동작 강도: 매우 높음',vcl:'alert',ab:75,ac:'var(--red-strong)',al:'고함/비명 감지 (92%)',acl:'alert',
+   awV:awL,awC:'#E24B4A',awL:'YAMNet: 고함 92%',vaX2:345,vaY2:45,vaTxt:'520 px/s',
+   fpt:'멀티모달 융합',fpv:['비전: 타격 동작 87%','오디오: 고함 92%','융합 점수: 0.89','임계값: 0.80','→ 공격 행동 판정 중'],fpc:'var(--amber)',
+   t:'<b>고함 + 급격한 동작</b> — YAMNet이 "고함/비명" 92% 확신. 비전의 타격 동작(87%)과 결합, 융합 점수 0.89. 임계값(0.80) 초과 → 공격 의심.'},
+  {p:'aggro',bb:true,trail:'M272,175 Q330,100 350,58',va:true,aw:true,fp:true,block:false,
+   pipe:[0,1,2,3],pw:[],pa2:[3],
+   vals:['550 px/s','매우 높음','비명','공격 확정'],mc:['alert','alert','alert','alert'],
+   vb:95,vc:'var(--red-strong)',vl:'타격 동작 연속 3회',vcl:'alert',ab:90,ac:'var(--red-strong)',al:'비명 + 물건 충돌음',acl:'alert',
+   awV:awS,awC:'#E24B4A',awL:'YAMNet: 비명 96%',vaX2:355,vaY2:35,vaTxt:'550 px/s',
+   fpt:'⚠ 공격 행동 확정',fpv:['비전: 타격 ×3 연속','오디오: 비명 96%','융합 점수: 0.95','행동 지속: 4.2초','→ Immediate 알림'],fpc:'var(--red-strong)',
+   t:'<b>⚠ 공격 행동 확정</b> — 타격 3회 연속(4.2초), 비명 + 충돌음 동시. 융합 점수 0.95. Immediate 알림 → 스마트워치 + 앱 동시 발송.'},
+  {p:'aggro',bb:true,trail:'M272,175 Q330,100 350,58',va:true,aw:true,fp:true,block:true,
+   pipe:[0,1,2,3,4],pw:[],pa2:[3,4],
+   vals:['550 px/s','매우 높음','비명','공격 확정'],mc:['alert','alert','alert','alert'],
+   vb:95,vc:'var(--red-strong)',vl:'타격 지속',vcl:'alert',ab:90,ac:'var(--red-strong)',al:'비명 지속',acl:'alert',
+   awV:awS,awC:'#E24B4A',awL:'YAMNet: 비명 96%',vaX2:355,vaY2:35,vaTxt:'550 px/s',
+   fpt:'⚠ 공격 확정 + 개입 차단',fpv:['Immediate 알림 발송','영상 클립 저장','AI 음성 개입: 차단','→ 보호자 직접 대응','(음성이 상태 악화 유발)'],fpc:'var(--red-strong)',
+   t:'<b>🚫 AI 음성 개입 차단 (Hard Block)</b> — 공격/초조 상태에서 AI 음성("진정하세요")은 <b>오히려 행동을 격화</b>시킴 (현장 보호자 경험 근거). 알림만 발송, 음성 개입 차단. 보호자 직접 대응 필요. <b>이것이 Amicus Brain의 핵심 설계 원칙.</b>'}
+];
+
+function go(s){
+  const d=S[s],c=clr[d.p];
+  setSkel(d.p,c);setBB(d.p,c,d.bb);
+  $('trail-r').setAttribute('d',d.trail);$('trail-r').setAttribute('opacity',d.trail?'0.6':'0');
+  const va=$('vel-arr');va.setAttribute('opacity',d.va?'1':'0');
+  if(d.va){const ln=va.querySelector('line'),dd=KP[d.p];ln.setAttribute('x1',dd.rwr[0]);ln.setAttribute('y1',dd.rwr[1]);ln.setAttribute('x2',d.vaX2);ln.setAttribute('y2',d.vaY2);$('va-txt').setAttribute('x',d.vaX2+8);$('va-txt').setAttribute('y',d.vaY2-5);$('va-txt').textContent=d.vaTxt;}
+  $('aw-panel').setAttribute('opacity',d.aw?'1':'0');
+  if(d.aw){setAW(d.awV,d.awC);$('aw-lbl').textContent=d.awL;}
+  $('fp').setAttribute('opacity',d.fp?'1':'0');
+  if(d.fp){$('fp-t').textContent=d.fpt;$('fp-t').setAttribute('fill',d.fpc);d.fpv.forEach((t,i)=>$('fp'+(i+1)).textContent=t);}
+  $('block-badge').setAttribute('opacity',d.block?'1':'0');
+  $('cv-f').style.width=d.vb+'%';$('cv-f').style.background=d.vc;$('cv-l').textContent=d.vl;$('ch-v').className='ch '+(d.vcl||'');
+  $('ca-f').style.width=d.ab+'%';$('ca-f').style.background=d.ac;$('ca-l').textContent=d.al;$('ch-a').className='ch '+(d.acl||'');
+  d.vals.forEach((v,i)=>$('v'+i).textContent=v);
+  [0,1,2,3].forEach(i=>{$('m'+i).classList.remove('warn','alert');if(d.mc[i])$('m'+i).classList.add(d.mc[i]);});
+  [0,1,2,3,4].forEach(i=>{const n=$('p'+i);n.classList.remove('lit','warn','alert');if(d.pa2.includes(i))n.classList.add('alert');else if(d.pw.includes(i))n.classList.add('warn');else if(d.pipe.includes(i))n.classList.add('lit');});
+  [0,1,2,3].forEach(i=>{const a=$('a'+i);a.classList.remove('lit','warn','alert');const ni=i+1;if(d.pa2.includes(ni))a.classList.add('alert');else if(d.pw.includes(ni))a.classList.add('warn');else if(d.pipe.includes(ni))a.classList.add('lit');});
+  document.querySelectorAll('.sb').forEach((b,i)=>{b.classList.remove('on','safe');if(i===s)b.classList.add(s<=1?'safe':'on');});
+  $('info').innerHTML=d.t;
+}
+</script>
+</body>
+</html>

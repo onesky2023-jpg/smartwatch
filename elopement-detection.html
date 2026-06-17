@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>탈출 탐지 파이프라인 — Amicus Brain</title>
+<style>
+  :root{--bg:#ffffff;--bg2:#f5f5f4;--bg3:#ededec;--tx:#1a1a1a;--tx2:#6b6b6b;--tx3:#9b9b9b;--bd:#e0e0de;--blue:#2563eb;--blue-bg:#eff6ff;--green:#0f6e56;--green-bg:#e1f5ee;--amber:#854f0b;--amber-bg:#faeeda;--red:#a32d2d;--red-bg:#fcebeb;--red-strong:#e24b4a;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  @media(prefers-color-scheme:dark){:root{--bg:#1a1a1a;--bg2:#262626;--bg3:#333;--tx:#e5e5e5;--tx2:#a0a0a0;--tx3:#707070;--bd:#404040;--blue:#60a5fa;--blue-bg:#1e3a5f;--green:#5dcaa5;--green-bg:#0a3d2e;--amber:#f0997b;--amber-bg:#4a2a10;--red:#f09595;--red-bg:#501313;--red-strong:#e24b4a}}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font);background:var(--bg);color:var(--tx);padding:16px;max-width:720px;margin:0 auto;font-size:14px;line-height:1.6}
+  h2{font-size:16px;font-weight:600;margin:0 0 12px;color:var(--tx)}
+  .room-wrap{position:relative;width:100%;aspect-ratio:680/420;margin:0 0 10px;background:var(--bg);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+  .room-wrap svg{width:100%;height:100%}
+  .step-row{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap}
+  .sb{padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);transition:all .15s;user-select:none;font-family:var(--font)}
+  .sb:hover{border-color:var(--tx3)}.sb.on{background:var(--red-bg);color:var(--red);border-color:var(--red);font-weight:600}.sb.safe{background:var(--green-bg);color:var(--green);border-color:var(--green);font-weight:600}
+  .ip{padding:12px 14px;border-radius:8px;border:1px solid var(--bd);background:var(--bg2);font-size:13px;line-height:1.7;color:var(--tx2);min-height:54px}
+  .ip b{color:var(--tx);font-weight:600}
+  .pr{display:flex;gap:5px;align-items:center;margin:10px 0 8px;flex-wrap:wrap}
+  .pn{padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid var(--bd);background:var(--bg);color:var(--tx3);transition:all .2s;white-space:nowrap}
+  .pn.lit{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+  .pn.alert{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+  .pa{color:var(--tx3);font-size:11px}.pa.lit{color:var(--blue)}.pa.alert{color:var(--red)}
+  .lg{display:flex;gap:14px;font-size:11px;color:var(--tx3);margin:4px 0 8px;flex-wrap:wrap}
+  .ld{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:3px;vertical-align:-1px}
+</style>
+</head>
+<body>
+<h2>탈출(Elopement) 탐지 파이프라인</h2>
+
+<div class="room-wrap">
+  <svg viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+    <rect x="40" y="30" width="600" height="360" rx="4" fill="none" stroke="var(--tx3)" stroke-width="0.5" stroke-dasharray="6 3"/>
+    <text x="52" y="50" fill="var(--tx3)" font-size="12" font-family="var(--font)">거실 (카메라 시야)</text>
+    <rect id="zone-safe" x="40" y="30" width="400" height="360" fill="var(--green)" opacity="0.05"/>
+    <rect id="zone-caution" x="440" y="30" width="120" height="360" fill="var(--amber)" opacity="0"/>
+    <rect id="zone-danger" x="560" y="30" width="80" height="360" fill="var(--red-strong)" opacity="0"/>
+    <rect x="620" y="140" width="20" height="100" rx="2" fill="var(--bg2)" stroke="var(--tx3)" stroke-width="1.5"/>
+    <text x="630" y="195" text-anchor="middle" fill="var(--tx3)" font-size="11" font-family="var(--font)" transform="rotate(-90 630 195)">현관문</text>
+    <path d="M80 60 L620 30 L620 390 L80 60Z" fill="var(--tx)" opacity="0.02"/>
+    <circle cx="70" cy="60" r="9" fill="var(--bg2)" stroke="var(--tx3)" stroke-width="1"/>
+    <text x="70" y="64" text-anchor="middle" font-size="12">📷</text>
+    <circle id="person" cx="200" cy="210" r="14" fill="#1D9E75" stroke="#0F6E56" stroke-width="1.5" opacity="0.9"/>
+    <text id="person-label" x="200" y="240" text-anchor="middle" fill="var(--green)" font-size="11" font-family="var(--font)">환자 (식별됨)</text>
+    <circle cx="150" cy="300" r="11" fill="var(--bg3)" stroke="var(--tx3)" stroke-width="1" opacity="0.5"/>
+    <text x="150" y="326" text-anchor="middle" fill="var(--tx3)" font-size="11" font-family="var(--font)">보호자</text>
+    <line id="zl1" x1="440" y1="30" x2="440" y2="390" stroke="var(--tx3)" stroke-width="0.5" stroke-dasharray="4 3" opacity="0"/>
+    <line id="zl2" x1="560" y1="30" x2="560" y2="390" stroke="var(--tx3)" stroke-width="0.5" stroke-dasharray="4 3" opacity="0"/>
+    <text id="zt0" x="240" y="405" text-anchor="middle" fill="var(--tx3)" font-size="11" font-family="var(--font)" opacity="0">안전 구역</text>
+    <text id="zt1" x="500" y="405" text-anchor="middle" fill="var(--tx3)" font-size="11" font-family="var(--font)" opacity="0">주의 구역</text>
+    <text id="zt2" x="600" y="405" text-anchor="middle" fill="var(--tx3)" font-size="11" font-family="var(--font)" opacity="0">위험 구역</text>
+    <rect id="bbox" x="182" y="192" width="36" height="36" rx="2" fill="none" stroke="none" stroke-width="1.5"/>
+    <text id="bbox-lbl" x="222" y="192" fill="var(--green)" font-size="11" font-family="var(--font)" opacity="0"></text>
+    <g id="alert-badge" opacity="0">
+      <rect x="490" y="70" width="130" height="36" rx="8" fill="var(--red-strong)" opacity="0.92"/>
+      <text x="555" y="93" text-anchor="middle" fill="#fff" font-size="13" font-weight="600" font-family="var(--font)">⚠ 탈출 경보</text>
+    </g>
+  </svg>
+</div>
+
+<div class="lg">
+  <span><span class="ld" style="background:#1D9E75"></span>환자 (인식됨)</span>
+  <span><span class="ld" style="background:var(--tx3)"></span>비환자</span>
+  <span><span class="ld" style="background:#BA7517"></span>주의 구역</span>
+  <span><span class="ld" style="background:#E24B4A"></span>위험 구역</span>
+</div>
+
+<div class="pr">
+  <span class="pn" id="p0">카메라 입력</span><span class="pa" id="a0">→</span>
+  <span class="pn" id="p1">YOLOv8 감지</span><span class="pa" id="a1">→</span>
+  <span class="pn" id="p2">ArcFace 식별</span><span class="pa" id="a2">→</span>
+  <span class="pn" id="p3">구역 판정</span><span class="pa" id="a3">→</span>
+  <span class="pn" id="p4">알림 발송</span>
+</div>
+
+<div class="step-row">
+  <button class="sb safe" onclick="go(0)">1. 평상시</button>
+  <button class="sb" onclick="go(1)">2. 사람 감지</button>
+  <button class="sb" onclick="go(2)">3. 환자 식별</button>
+  <button class="sb" onclick="go(3)">4. 주의 구역</button>
+  <button class="sb" onclick="go(4)">5. 위험 구역</button>
+  <button class="sb" onclick="go(5)">6. 탈출 경보</button>
+</div>
+
+<div class="ip" id="info">
+  <b>평상시 모니터링</b> — 카메라가 방 전체를 촬영 중. 구역 분석이나 인물 식별이 활성화되지 않은 상태. 보호자와 환자 모두 안전 구역에 위치.
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const S=[
+  {px:200,py:210,bb:false,bc:'',bt:'',zones:false,alert:false,pc:'#1D9E75',ps:'#0F6E56',pipe:[],pa:[],
+   t:'<b>평상시 모니터링</b> — 카메라가 방 전체를 촬영 중. 구역 분석이나 인물 식별이 활성화되지 않은 상태. 보호자와 환자 모두 안전 구역에 위치.'},
+  {px:200,py:210,bb:true,bc:'#2563eb',bt:'person 0.94',zones:false,alert:false,pc:'#2563eb',ps:'#1e40af',pipe:[0,1],pa:[],
+   t:'<b>YOLOv8 사람 감지</b> — 프레임에서 사람 객체 2개 검출. 바운딩 박스와 신뢰도(0.94) 생성. 아직 누구인지는 모름.'},
+  {px:200,py:210,bb:true,bc:'#1D9E75',bt:'환자 (99.2%)',zones:true,alert:false,pc:'#1D9E75',ps:'#0F6E56',pipe:[0,1,2],pa:[],
+   t:'<b>ArcFace 얼굴 식별</b> — 등록된 환자 얼굴 임베딩과 비교해 99.2% 일치. 보호자는 비환자로 분류, 구역 판정에서 제외. <b>환자만 추적</b>.'},
+  {px:470,py:210,bb:true,bc:'#BA7517',bt:'주의 구역',zones:true,alert:false,pc:'#BA7517',ps:'#854F0B',pipe:[0,1,2,3],pa:[],
+   t:'<b>주의 구역 진입</b> — 환자가 출입구 방향으로 이동, 문으로부터 2m 이내 진입. 앱에 Medium 레벨 푸시 알림 전송.'},
+  {px:580,py:210,bb:true,bc:'#E24B4A',bt:'위험!',zones:true,alert:false,pc:'#E24B4A',ps:'#A32D2D',pipe:[0,1,2,3],pa:[3],
+   t:'<b>위험 구역 진입</b> — 문 바로 앞 0.5m 이내 도달. "탈출 임박" 분류. YAMNet이 문 소리를 병렬 감지 중.'},
+  {px:610,py:210,bb:true,bc:'#E24B4A',bt:'탈출!',zones:true,alert:true,pc:'#E24B4A',ps:'#A32D2D',pipe:[0,1,2,3,4],pa:[3,4],
+   t:'<b>⚠ 탈출 경보 발동</b> — Immediate 알림. 스마트워치 강한 햅틱 + 앱 푸시 + 대시보드 업데이트 동시 실행. 보호자 미응답 시 긴급 연락처 에스컬레이션.'}
+];
+function go(s){
+  const d=S[s];
+  $('person').setAttribute('cx',d.px);$('person').setAttribute('cy',d.py);
+  $('person').setAttribute('fill',d.pc);$('person').setAttribute('stroke',d.ps);
+  $('person-label').setAttribute('x',d.px);$('person-label').setAttribute('y',d.py+30);
+  if(d.bb){$('bbox').setAttribute('x',d.px-18);$('bbox').setAttribute('y',d.py-18);$('bbox').setAttribute('width',36);$('bbox').setAttribute('height',36);$('bbox').setAttribute('stroke',d.bc);$('bbox-lbl').setAttribute('x',d.px+22);$('bbox-lbl').setAttribute('y',d.py-20);$('bbox-lbl').textContent=d.bt;$('bbox-lbl').setAttribute('opacity','1');$('bbox-lbl').setAttribute('fill',d.bc);}
+  else{$('bbox').setAttribute('stroke','none');$('bbox-lbl').setAttribute('opacity','0');}
+  $('zone-caution').setAttribute('opacity',d.zones?'0.08':'0');
+  $('zone-danger').setAttribute('opacity',d.zones?'0.1':'0');
+  ['zl1','zl2'].forEach(id=>$(id).setAttribute('opacity',d.zones?'0.5':'0'));
+  ['zt0','zt1','zt2'].forEach(id=>$(id).setAttribute('opacity',d.zones?'0.7':'0'));
+  $('alert-badge').setAttribute('opacity',d.alert?'1':'0');
+  [0,1,2,3,4].forEach(i=>{const n=$('p'+i);n.classList.remove('lit','alert');if(d.pa.includes(i))n.classList.add('alert');else if(d.pipe.includes(i))n.classList.add('lit');});
+  [0,1,2,3].forEach(i=>{const a=$('a'+i);a.classList.remove('lit','alert');const ni=i+1;if(d.pa.includes(ni))a.classList.add('alert');else if(d.pipe.includes(ni))a.classList.add('lit');});
+  document.querySelectorAll('.sb').forEach((b,i)=>{b.classList.remove('on','safe');if(i===s)b.classList.add(s<=1?'safe':'on');});
+  $('info').innerHTML=d.t;
+}
+</script>
+</body>
+</html>
