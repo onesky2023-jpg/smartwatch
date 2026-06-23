@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>돌봄 일지 - 6월 22일</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.6.0/tabler-icons.min.css">
+<style>
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f4;
+  --bg-info: #E6F1FB;
+  --bg-success: #E1F5EE;
+  --bg-warning: #FAEEDA;
+  --bg-danger: #FCEBEB;
+  --text-primary: #1a1a1a;
+  --text-secondary: #737373;
+  --text-tertiary: #a3a3a3;
+  --text-info: #0C447C;
+  --text-success: #085041;
+  --text-warning: #633806;
+  --text-danger: #791F1F;
+  --border: rgba(0,0,0,0.08);
+  --border-info: #85B7EB;
+  --border-success: #5DCAA5;
+  --border-warning: #FAC775;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #262626;
+    --bg-info: #0C447C;
+    --bg-success: #085041;
+    --bg-warning: #633806;
+    --bg-danger: #501313;
+    --text-primary: #f5f5f5;
+    --text-secondary: #a3a3a3;
+    --text-tertiary: #737373;
+    --text-info: #85B7EB;
+    --text-success: #5DCAA5;
+    --text-warning: #FAC775;
+    --text-danger: #F09595;
+    --border: rgba(255,255,255,0.1);
+    --border-info: #185FA5;
+    --border-success: #0F6E56;
+    --border-warning: #854F0B;
+  }
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+.phone {
+  width: 100%;
+  max-width: 390px;
+  background: var(--bg-primary);
+  min-height: 100vh;
+}
+.header {
+  padding: 14px 16px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-nav i { font-size: 18px; color: var(--text-tertiary); cursor: pointer; }
+.header-date-sub { font-size: 11px; color: var(--text-tertiary); }
+.header-date { font-size: 17px; font-weight: 500; margin-top: 2px; }
+.header-actions { display: flex; gap: 8px; }
+.header-actions i { font-size: 18px; color: var(--text-secondary); cursor: pointer; }
+.sec { padding: 0 16px 14px; }
+.sec-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sec-title i { font-size: 14px; }
+.tag {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.tag-info { background: var(--bg-info); color: var(--text-info); }
+.tag-success { background: var(--bg-success); color: var(--text-success); }
+.tag-warning { background: var(--bg-warning); color: var(--text-warning); }
+.tag-neutral { background: var(--bg-secondary); color: var(--text-tertiary); }
+
+.summary-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+}
+.summary-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.summary-desc { font-size: 12px; color: var(--text-secondary); }
+.summary-tags { display: flex; gap: 6px; margin-top: 8px; }
+
+.evt {
+  border: 0.5px solid var(--border);
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 0;
+}
+.evt-warning { border-left: 3px solid #EF9F27; }
+.evt-good { border-left: 3px solid #1D9E75; }
+.evt-header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.evt-time { font-size: 11px; color: var(--text-tertiary); }
+.evt-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.evt-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+.evt-meta { display: flex; gap: 12px; font-size: 11px; color: var(--text-tertiary); }
+.evt-meta i { font-size: 12px; }
+.evt-judge { margin-top: 8px; padding-top: 8px; border-top: 0.5px solid var(--border); }
+.evt-judge-label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 4px; }
+.evt-judge-btns { display: flex; gap: 6px; }
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.metric-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+.metric-label { font-size: 11px; color: var(--text-tertiary); }
+.metric-value { font-size: 15px; font-weight: 500; margin-top: 2px; }
+.metric-sub { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+
+.record-list {
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.record-row {
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 0.5px solid var(--border);
+}
+.record-row:last-child { border-bottom: none; }
+.record-left { display: flex; align-items: center; gap: 8px; }
+.record-left i { font-size: 16px; color: var(--text-secondary); }
+.record-left span { font-size: 13px; }
+.record-btns { display: flex; gap: 4px; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: 0.5px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 5px 10px;
+  font-size: 11px;
+  transition: all 0.15s;
+}
+button:hover { background: var(--bg-secondary); }
+button:active { transform: scale(0.98); }
+button.selected-success { background: var(--bg-success); color: var(--text-success); border-color: var(--border-success); }
+button.selected-warning { background: var(--bg-warning); color: var(--text-warning); border-color: var(--border-warning); }
+
+.ai-card {
+  background: var(--bg-info);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+}
+.ai-card-title { font-size: 12px; font-weight: 500; color: var(--text-info); margin-bottom: 4px; }
+.ai-card-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+.ai-card-action { font-size: 11px; color: var(--text-info); }
+
+.memo-box {
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+}
+.memo-box textarea {
+  width: 100%;
+  border: none;
+  resize: none;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: transparent;
+  min-height: 60px;
+  outline: none;
+  font-family: inherit;
+  line-height: 1.6;
+}
+.memo-box textarea::placeholder { color: var(--text-tertiary); }
+
+.btn-primary {
+  width: 100%;
+  padding: 10px;
+  font-size: 13px;
+  background: var(--bg-info);
+  color: var(--text-info);
+  border: 0.5px solid var(--border-info);
+}
+
+.bottom-nav {
+  border-top: 0.5px solid var(--border);
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-around;
+  position: sticky;
+  bottom: 0;
+  background: var(--bg-primary);
+}
+.nav-item { text-align: center; }
+.nav-item i { font-size: 18px; }
+.nav-item p { font-size: 9px; margin-top: 1px; }
+.nav-item.active i, .nav-item.active p { color: var(--text-info); }
+.nav-item:not(.active) i, .nav-item:not(.active) p { color: var(--text-tertiary); }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="header">
+    <div class="header-nav">
+      <i class="ti ti-chevron-left"></i>
+      <div>
+        <p class="header-date-sub">일요일</p>
+        <p class="header-date">6월 22일 돌봄 일지</p>
+      </div>
+      <i class="ti ti-chevron-right"></i>
+    </div>
+    <div class="header-actions">
+      <i class="ti ti-share"></i>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="summary-card">
+      <p class="summary-title">대체로 안정적인 하루였어요</p>
+      <p class="summary-desc">새벽에 배회 행동이 1회 있었지만, 낮 시간은 평온했어요. 오후에 TV를 보며 편안하게 지내셨어요.</p>
+      <div class="summary-tags">
+        <span class="tag tag-warning"><i class="ti ti-alert-triangle" style="font-size:12px"></i> 주의 1건</span>
+        <span class="tag tag-success"><i class="ti ti-check" style="font-size:12px"></i> 오탐 0건</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <p class="sec-title"><i class="ti ti-alert-circle"></i> 주요 이벤트</p>
+
+    <div class="evt evt-warning">
+      <div class="evt-header">
+        <span class="tag tag-warning">주의</span>
+        <span class="evt-time">새벽 3:41</span>
+      </div>
+      <p class="evt-title">야간 배회</p>
+      <p class="evt-desc">침실 → 거실 → 현관 이동. 평소보다 긴 이동 패턴이 감지되었어요.</p>
+      <div class="evt-meta">
+        <span><i class="ti ti-clock"></i> 대응 시간 8분</span>
+        <span><i class="ti ti-clock-stop"></i> 안정화 12분</span>
+      </div>
+      <div class="evt-judge">
+        <p class="evt-judge-label">보호자 판정</p>
+        <div class="evt-judge-btns">
+          <button class="selected-warning" onclick="selectJudge(this)">실제 배회</button>
+          <button onclick="selectJudge(this)">화장실 가려던 것</button>
+          <button onclick="selectJudge(this)">기타</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="evt evt-good">
+      <div class="evt-header">
+        <span class="tag tag-success">좋은 순간</span>
+        <span class="evt-time">오후 2:00 ~ 2:45</span>
+      </div>
+      <p class="evt-title">거실에서 45분간 편안하게 지내셨어요</p>
+      <p class="evt-desc">소파에 앉아 TV를 보시면서 안정적인 상태가 지속됐어요. 오늘 가장 긴 안정 구간이에요.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <p class="sec-title"><i class="ti ti-clock"></i> 수면 · 활동 <span class="tag tag-info">자동 기록</span></p>
+    <div class="grid-2">
+      <div class="metric-card">
+        <p class="metric-label">취침</p>
+        <p class="metric-value">밤 10:15</p>
+      </div>
+      <div class="metric-card">
+        <p class="metric-label">기상</p>
+        <p class="metric-value">오전 6:45</p>
+      </div>
+      <div class="metric-card">
+        <p class="metric-label">야간 깸</p>
+        <p class="metric-value">2회</p>
+        <p class="metric-sub">1:20 화장실 · 3:41 배회</p>
+      </div>
+      <div class="metric-card">
+        <p class="metric-label">활동량</p>
+        <p class="metric-value">보통</p>
+        <p class="metric-sub">어제와 비슷</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <p class="sec-title"><i class="ti ti-clipboard"></i> 생활 기록 <span class="tag tag-neutral">보호자 입력</span></p>
+    <div class="record-list">
+      <div class="record-row">
+        <div class="record-left"><i class="ti ti-bowl"></i><span>아침 식사</span></div>
+        <div class="record-btns">
+          <button onclick="selectRecord(this)">정상</button>
+          <button class="selected-warning" onclick="selectRecord(this)">절반</button>
+          <button onclick="selectRecord(this)">거부</button>
+        </div>
+      </div>
+      <div class="record-row">
+        <div class="record-left"><i class="ti ti-bowl"></i><span>점심 식사</span></div>
+        <div class="record-btns">
+          <button class="selected-success" onclick="selectRecord(this)">정상</button>
+          <button onclick="selectRecord(this)">절반</button>
+          <button onclick="selectRecord(this)">거부</button>
+        </div>
+      </div>
+      <div class="record-row">
+        <div class="record-left"><i class="ti ti-bowl"></i><span>저녁 식사</span></div>
+        <div class="record-btns">
+          <button onclick="selectRecord(this)">정상</button>
+          <button onclick="selectRecord(this)">절반</button>
+          <button onclick="selectRecord(this)">거부</button>
+        </div>
+      </div>
+      <div class="record-row">
+        <div class="record-left"><i class="ti ti-pill"></i><span>복약</span></div>
+        <div class="record-btns">
+          <button class="selected-success" onclick="selectRecord(this)">복용</button>
+          <button onclick="selectRecord(this)">미복용</button>
+          <button onclick="selectRecord(this)">약 변경</button>
+        </div>
+      </div>
+      <div class="record-row">
+        <div class="record-left"><i class="ti ti-mood-smile"></i><span>오늘 정서 상태</span></div>
+        <div class="record-btns">
+          <button onclick="selectRecord(this)">차분</button>
+          <button class="selected-warning" onclick="selectRecord(this)">불안</button>
+          <button onclick="selectRecord(this)">무기력</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <p class="sec-title"><i class="ti ti-bulb"></i> AI 관찰</p>
+    <div class="ai-card">
+      <p class="ai-card-title">패턴 변화 감지</p>
+      <p class="ai-card-desc">이번 주 야간 배회가 2회로, 지난주(0회)보다 늘었어요. 최근 약물 변경(6월 18일)과 관련이 있을 수 있어요.</p>
+      <p class="ai-card-action">다음 진료 시 담당 의사에게 공유해보시는 걸 추천해요.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <p class="sec-title"><i class="ti ti-pencil"></i> 보호자 메모</p>
+    <div class="memo-box">
+      <textarea placeholder="오늘 특이사항이나 기억할 것을 적어주세요...">새벽에 배회할 때 "집에 가야 한다"고 반복하셨음. 약 바꾼 뒤로 야간에 더 불안해하시는 것 같음.</textarea>
+    </div>
+  </div>
+
+  <div style="padding: 0 16px 14px;">
+    <button class="btn-primary">일지 저장</button>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item"><i class="ti ti-home"></i><p>홈</p></div>
+    <div class="nav-item active"><i class="ti ti-notebook"></i><p>일지</p></div>
+    <div class="nav-item"><i class="ti ti-chart-bar"></i><p>리포트</p></div>
+    <div class="nav-item"><i class="ti ti-settings"></i><p>설정</p></div>
+  </div>
+
+</div>
+
+<script>
+function selectRecord(btn) {
+  const row = btn.closest('.record-btns');
+  row.querySelectorAll('button').forEach(b => {
+    b.classList.remove('selected-success', 'selected-warning');
+  });
+  const text = btn.textContent;
+  if (['정상', '복용', '차분'].includes(text)) {
+    btn.classList.add('selected-success');
+  } else {
+    btn.classList.add('selected-warning');
+  }
+}
+function selectJudge(btn) {
+  const row = btn.closest('.evt-judge-btns');
+  row.querySelectorAll('button').forEach(b => {
+    b.classList.remove('selected-warning');
+  });
+  btn.classList.add('selected-warning');
+}
+</script>
+</body>
+</html>

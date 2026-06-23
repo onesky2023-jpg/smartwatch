@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>돌봄 리포트</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.6.0/tabler-icons.min.css">
+<style>
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f4;
+  --bg-info: #E6F1FB;
+  --bg-success: #E1F5EE;
+  --bg-warning: #FAEEDA;
+  --bg-danger: #FCEBEB;
+  --text-primary: #1a1a1a;
+  --text-secondary: #737373;
+  --text-tertiary: #a3a3a3;
+  --text-info: #0C447C;
+  --text-success: #085041;
+  --text-warning: #633806;
+  --text-danger: #791F1F;
+  --border: rgba(0,0,0,0.08);
+  --border-info: #85B7EB;
+  --border-warning: #FAC775;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --purple: #534AB7;
+  --amber: #EF9F27;
+  --blue: #378ADD;
+  --red: #E24B4A;
+  --teal: #1D9E75;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #262626;
+    --bg-info: #0C447C;
+    --bg-success: #085041;
+    --bg-warning: #633806;
+    --bg-danger: #501313;
+    --text-primary: #f5f5f5;
+    --text-secondary: #a3a3a3;
+    --text-tertiary: #737373;
+    --text-info: #85B7EB;
+    --text-success: #5DCAA5;
+    --text-warning: #FAC775;
+    --text-danger: #F09595;
+    --border: rgba(255,255,255,0.1);
+    --border-info: #185FA5;
+    --border-warning: #854F0B;
+  }
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+.phone {
+  width: 100%;
+  max-width: 390px;
+  background: var(--bg-primary);
+  min-height: 100vh;
+}
+.tab-row { display: flex; gap: 0; border-bottom: 0.5px solid var(--border); }
+.tab-btn {
+  flex: 1;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-tertiary);
+  font-family: inherit;
+  border-radius: 0;
+}
+.tab-btn.active {
+  color: var(--text-info);
+  border-bottom-color: var(--text-info);
+}
+.screen { display: none; }
+.screen.active { display: block; }
+
+.header {
+  padding: 14px 16px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-nav { display: flex; align-items: center; gap: 8px; }
+.header-nav i { font-size: 18px; color: var(--text-tertiary); cursor: pointer; }
+.sec { padding: 0 16px 14px; }
+.sec-title {
+  font-size: 13px; font-weight: 500; color: var(--text-secondary);
+  margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+}
+.sec-title i { font-size: 14px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.mc {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+.mc-label { font-size: 11px; color: var(--text-tertiary); }
+.mc-val { font-size: 20px; font-weight: 500; margin-top: 2px; display: flex; align-items: baseline; gap: 4px; }
+.mc-sub { font-size: 10px; margin-top: 2px; }
+.tag {
+  font-size: 10px; padding: 2px 8px; border-radius: 99px;
+  display: inline-flex; align-items: center; gap: 3px;
+}
+.tag-success { background: var(--bg-success); color: var(--text-success); }
+.tag-warning { background: var(--bg-warning); color: var(--text-warning); }
+
+.summary-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+}
+.summary-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.summary-desc { font-size: 12px; color: var(--text-secondary); }
+
+.bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 80px; padding: 0 4px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.bar-fill { width: 100%; border-radius: 3px 3px 0 0; }
+.bar-label { font-size: 10px; color: var(--text-tertiary); }
+
+.insight-card {
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  margin-bottom: 8px;
+}
+.insight-title { font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+.insight-desc { font-size: 12px; color: var(--text-secondary); }
+
+.caregiver-card {
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+}
+.caregiver-warning {
+  background: var(--bg-warning);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  margin-bottom: 8px;
+}
+.caregiver-warning-title { font-size: 12px; font-weight: 500; color: var(--text-warning); margin-bottom: 4px; }
+.caregiver-warning-desc { font-size: 12px; color: var(--text-secondary); }
+
+.progress-row { margin-bottom: 6px; }
+.progress-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; }
+.progress-track { height: 8px; background: var(--bg-secondary); border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 4px; }
+
+.doctor-card {
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+}
+.doctor-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+
+button {
+  font-family: inherit; cursor: pointer;
+  border: 0.5px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  font-size: 13px;
+  width: 100%;
+  transition: all 0.15s;
+}
+button:hover { background: var(--bg-secondary); }
+button:active { transform: scale(0.98); }
+.btn-info { background: var(--bg-info); color: var(--text-info); border-color: var(--border-info); }
+
+.bottom-nav {
+  border-top: 0.5px solid var(--border);
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-around;
+  position: sticky;
+  bottom: 0;
+  background: var(--bg-primary);
+}
+.nav-item { text-align: center; }
+.nav-item i { font-size: 18px; }
+.nav-item p { font-size: 9px; margin-top: 1px; }
+.nav-active i, .nav-active p { color: var(--text-info); }
+.nav-inactive i, .nav-inactive p { color: var(--text-tertiary); }
+
+.resource-row {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.resource-row i { font-size: 14px; color: var(--text-info); }
+
+.week-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
+.week-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.week-val { font-size: 10px; font-weight: 500; }
+.week-bar { width: 100%; border-radius: 3px 3px 0 0; }
+.week-label { font-size: 10px; color: var(--text-tertiary); }
+.marker-line { display: flex; align-items: center; gap: 4px; margin-top: 6px; }
+.marker-dash { flex: 1; border-top: 0.5px dashed var(--border); }
+.marker-text { font-size: 10px; color: var(--text-tertiary); }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="tab-row">
+    <div class="tab-btn active" onclick="switchTab('weekly')">주간 리포트</div>
+    <div class="tab-btn" onclick="switchTab('monthly')">월간 리포트</div>
+  </div>
+
+  <!-- ===== WEEKLY ===== -->
+  <div class="screen active" id="weekly">
+
+    <div class="header">
+      <div class="header-nav">
+        <i class="ti ti-chevron-left"></i>
+        <div>
+          <p style="font-size:11px;color:var(--text-tertiary)">6월 3주차</p>
+          <p style="font-size:17px;font-weight:500;margin-top:2px">6.16 ~ 6.22 주간 리포트</p>
+        </div>
+        <i class="ti ti-chevron-right"></i>
+      </div>
+      <i class="ti ti-share" style="font-size:18px;color:var(--text-secondary);cursor:pointer"></i>
+    </div>
+
+    <div class="sec">
+      <div class="summary-card">
+        <p class="summary-title">지난주보다 야간 활동이 조금 늘었어요</p>
+        <p class="summary-desc">주간 활동은 안정적이었지만, 6/18 약물 변경 이후 야간 배회가 2회 발생했어요. 전반적인 정서 상태는 지난주와 비슷해요.</p>
+      </div>
+    </div>
+
+    <div class="sec">
+      <p class="sec-title">핵심 지표</p>
+      <div class="grid-2">
+        <div class="mc">
+          <p class="mc-label">알림 발생</p>
+          <div class="mc-val">5회 <span class="tag tag-warning"><i class="ti ti-arrow-up" style="font-size:10px"></i>+2</span></div>
+        </div>
+        <div class="mc">
+          <p class="mc-label">오탐률</p>
+          <div class="mc-val">20% <span class="tag tag-success"><i class="ti ti-arrow-down" style="font-size:10px"></i>-10%</span></div>
+        </div>
+        <div class="mc">
+          <p class="mc-label">야간 깸</p>
+          <div class="mc-val">평균 1.7회</div>
+          <p class="mc-sub" style="color:var(--text-warning)">지난주 0.9회</p>
+        </div>
+        <div class="mc">
+          <p class="mc-label">평균 수면</p>
+          <div class="mc-val">7.2시간</div>
+          <p class="mc-sub">지난주 7.8시간</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <p class="sec-title">요일별 알림 분포</p>
+      <div class="bar-chart">
+        <div class="bar-col"><div class="bar-fill" style="height:16px;background:var(--bg-success)"></div><span class="bar-label">월</span></div>
+        <div class="bar-col"><div class="bar-fill" style="height:0px;background:var(--bg-success)"></div><span class="bar-label">화</span></div>
+        <div class="bar-col"><div class="bar-fill" style="height:32px;background:var(--bg-warning)"></div><span class="bar-label">수</span></div>
+        <div class="bar-col"><div class="bar-fill" style="height:16px;background:var(--bg-success)"></div><span class="bar-label">목</span></div>
+        <div class="bar-col"><div class="bar-fill" style="height:0px;background:var(--bg-success)"></div><span class="bar-label">금</span></div>
+        <div class="bar-col"><div class="bar-fill" style="height:48px;background:var(--bg-warning)"></div><span class="bar-label">토</span></div>
+        <div class="bar-col"><div class="bar-fill" style="height:64px;background:var(--bg-warning)"></div><span class="bar-label" style="color:var(--text-warning);font-weight:500">일</span></div>
+      </div>
+      <p style="font-size:11px;color:var(--text-tertiary);margin-top:6px;text-align:center">주말에 알림이 집중됨 · 약물 변경(6/18 수) 이후 증가 추세</p>
+    </div>
+
+    <div class="sec">
+      <p class="sec-title"><i class="ti ti-bulb"></i> AI 패턴 인사이트</p>
+      <div class="insight-card" style="background:var(--bg-info)">
+        <p class="insight-title" style="color:var(--text-info)">약물 변경과 야간 행동 상관관계</p>
+        <p class="insight-desc">6/18 약물 변경 이후 야간 배회가 0회 → 2회로 증가했어요. 약물 적응 기간(보통 1~2주)일 수 있지만, 지속되면 의료진 상담을 권해요.</p>
+      </div>
+      <div class="insight-card" style="background:var(--bg-secondary)">
+        <p class="insight-title">식사량 감소 추세</p>
+        <p class="insight-desc">이번 주 식사 거부/절반이 4회로 지난주(1회)보다 늘었어요. 정서 상태 '불안' 태그와 겹치는 날이 많아요.</p>
+      </div>
+    </div>
+
+    <div class="sec">
+      <p class="sec-title"><i class="ti ti-heart"></i> 보호자님 이번 주</p>
+      <div class="caregiver-card">
+        <div class="grid-2" style="margin-bottom:8px">
+          <div>
+            <p style="font-size:11px;color:var(--text-tertiary)">야간 깨움</p>
+            <p style="font-size:15px;font-weight:500;margin-top:2px">4회</p>
+            <p style="font-size:10px;color:var(--text-warning);margin-top:1px">지난주 1회</p>
+          </div>
+          <div>
+            <p style="font-size:11px;color:var(--text-tertiary)">평균 대응 시간</p>
+            <p style="font-size:15px;font-weight:500;margin-top:2px">6분</p>
+            <p style="font-size:10px;color:var(--text-success);margin-top:1px">충분히 빠른 대응이에요</p>
+          </div>
+        </div>
+        <div style="border-top:0.5px solid var(--border);padding-top:8px">
+          <p style="font-size:12px;color:var(--text-secondary)">야간 깨움이 늘었어요. 수면의 질이 떨어지셨을 수 있어요. 가능하다면 다른 가족에게 야간 교대를 부탁하시는 것도 방법이에요.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:0 16px 14px">
+      <button>카카오톡으로 가족에게 공유</button>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item nav-inactive"><i class="ti ti-home"></i><p>홈</p></div>
+      <div class="nav-item nav-inactive"><i class="ti ti-notebook"></i><p>일지</p></div>
+      <div class="nav-item nav-active"><i class="ti ti-chart-bar"></i><p>리포트</p></div>
+      <div class="nav-item nav-inactive"><i class="ti ti-settings"></i><p>설정</p></div>
+    </div>
+  </div>
+
+  <!-- ===== MONTHLY ===== -->
+  <div class="screen" id="monthly">
+
+    <div class="header">
+      <div class="header-nav">
+        <i class="ti ti-chevron-left"></i>
+        <div>
+          <p style="font-size:11px;color:var(--text-tertiary)">2026년</p>
+          <p style="font-size:17px;font-weight:500;margin-top:2px">6월 월간 리포트</p>
+        </div>
+        <i class="ti ti-chevron-right"></i>
+      </div>
+      <i class="ti ti-download" style="font-size:18px;color:var(--text-secondary);cursor:pointer"></i>
+    </div>
+
+    <div class="sec">
+      <div class="summary-card">
+        <p class="summary-title">5월 대비 야간 행동이 증가했지만, 낮 활동은 안정적이에요</p>
+        <p class="summary-desc">6/18 약물 변경 이후 야간 패턴 변화가 뚜렷해요. 낙상 위험 감지는 줄었고, 식사 패턴에 주의가 필요해요.</p>
+      </div>
+    </div>
+
+    <div class="sec">
+      <p class="sec-title">월간 요약</p>
+      <div class="grid-2">
+        <div class="mc">
+          <p class="mc-label">전체 알림</p>
+          <div class="mc-val">17회 <span class="tag tag-success"><i class="ti ti-arrow-down" style="font-size:10px"></i>-3</span></div>
+          <p class="mc-sub" style="color:var(--text-success)">5월 대비 감소</p>
+        </div>
+        <div class="mc">
+          <p class="mc-label">오탐률</p>
+          <div class="mc-val">18% <span class="tag tag-success"><i class="ti ti-arrow-down" style="font-size:10px"></i>-12%</span></div>
+          <p class="mc-sub" style="color:var(--text-success)">시스템이 학습하고 있어요</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <p class="sec-title">유형별 알림 분포</p>
+      <div class="progress-row">
+        <div class="progress-header"><span>야간 배회/활동</span><span style="color:var(--text-secondary)">7회</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:41%;background:var(--purple)"></div></div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-header"><span>낙상 위험</span><span style="color:var(--text-secondary)">4회</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:24%;background:var(--amber)"></div></div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-header"><span>배회 (주간)</span><span style="color:var(--text-secondary)">4회</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:24%;background:var(--blue)"></div></div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-header"><span>공격 행동</span><span style="color:var(--text-secondary)">2회</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:12%;background:var(--red)"></div></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <p class="sec-title">주차별 추이</p>
+      <div class="week-chart">
+        <div class="week-col">
+          <span class="week-val">3</span>
+          <div class="week-bar" style="height:24px;background:var(--purple);opacity:0.3"></div>
+          <span class="week-label">1주</span>
+        </div>
+        <div class="week-col">
+          <span class="week-val">3</span>
+          <div class="week-bar" style="height:24px;background:var(--purple);opacity:0.3"></div>
+          <span class="week-label">2주</span>
+        </div>
+        <div class="week-col">
+          <span class="week-val">5</span>
+          <div class="week-bar" style="height:40px;background:var(--purple);opacity:0.6"></div>
+          <span class="week-label">3주</span>
+        </div>
+        <div class="week-col">
+          <span class="week-val">6</span>
+          <div class="week-bar" style="height:48px;background:var(--purple)"></div>
+          <span class="week-label">4주</span>
+        </div>
+      </div>
+      <div class="marker-line">
+        <div class="marker-dash"></div>
+        <span class="marker-text">6/18 약물 변경</span>
+        <i class="ti ti-arrow-up" style="font-size:10px;color:var(--text-tertiary)"></i>
+      </div>
+    </div>
+
+    <div class="sec">
+      <p class="sec-title"><i class="ti ti-heart"></i> 보호자님의 한 달</p>
+      <div class="caregiver-card">
+        <div class="grid-2" style="margin-bottom:10px">
+          <div>
+            <p style="font-size:11px;color:var(--text-tertiary)">야간 깨움</p>
+            <p style="font-size:18px;font-weight:500;margin-top:2px">총 12회</p>
+            <p style="font-size:10px;color:var(--text-warning);margin-top:1px">5월 5회 대비 증가</p>
+          </div>
+          <div>
+            <p style="font-size:11px;color:var(--text-tertiary)">수면 방해 시간</p>
+            <p style="font-size:18px;font-weight:500;margin-top:2px">약 6시간</p>
+            <p style="font-size:10px;color:var(--text-warning);margin-top:1px">5월 2시간 대비 증가</p>
+          </div>
+        </div>
+
+        <div class="caregiver-warning">
+          <p class="caregiver-warning-title">보호자 부담이 늘고 있어요</p>
+          <p class="caregiver-warning-desc">야간 대응이 5월 대비 2.4배 증가했어요. 이 수준이 지속되면 보호자 소진 위험이 있어요. 가족 교대, 야간 돌봄 서비스, 또는 단기 입소를 고려해보세요.</p>
+        </div>
+
+        <div class="resource-row"><i class="ti ti-phone"></i><span>치매안심센터 상담 전화 1899-9988</span></div>
+        <div class="resource-row"><i class="ti ti-phone"></i><span>장기요양 상담 1644-8000</span></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <p class="sec-title"><i class="ti ti-stethoscope"></i> 의료진 공유용</p>
+      <div class="doctor-card">
+        <p class="doctor-desc">다음 진료 시 의사에게 보여줄 수 있는 1페이지 요약을 만들어드려요. 야간 행동 변화, 식사 패턴, 약물 변경 전후 비교가 포함돼요.</p>
+        <button class="btn-info">진료용 PDF 내보내기</button>
+      </div>
+    </div>
+
+    <div style="padding:0 16px 14px">
+      <button>카카오톡으로 가족에게 공유</button>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item nav-inactive"><i class="ti ti-home"></i><p>홈</p></div>
+      <div class="nav-item nav-inactive"><i class="ti ti-notebook"></i><p>일지</p></div>
+      <div class="nav-item nav-active"><i class="ti ti-chart-bar"></i><p>리포트</p></div>
+      <div class="nav-item nav-inactive"><i class="ti ti-settings"></i><p>설정</p></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  const btns = document.querySelectorAll('.tab-btn');
+  if (tab === 'weekly') btns[0].classList.add('active');
+  else btns[1].classList.add('active');
+}
+</script>
+</body>
+</html>
