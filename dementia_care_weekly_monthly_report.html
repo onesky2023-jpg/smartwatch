@@ -1,0 +1,320 @@
+
+<h2 class="sr-only">치매 돌봄 AI - 주간 리포트 및 월간 리포트</h2>
+<style>
+.ph{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);overflow:hidden}
+.sec{padding:0 16px 14px}
+.sec-t{font-size:13px;font-weight:500;color:var(--color-text-secondary);margin:0 0 8px;display:flex;align-items:center;gap:6px}
+.mc{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px}
+.sg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.tag{font-size:10px;padding:2px 8px;border-radius:99px;display:inline-flex;align-items:center;gap:3px}
+.tr-btn{flex:1;padding:9px;font-size:12px;font-weight:500;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.tr-btn.on{background:var(--color-background-primary);border:2px solid var(--color-border-info);color:var(--color-text-info)}
+.sc{display:none}.sc.vis{display:block}
+</style>
+
+<div style="padding:1rem 0">
+<div style="display:flex;gap:8px;margin-bottom:1.25rem">
+<button class="tr-btn on" id="tw" onclick="sw('w')">주간 리포트</button>
+<button class="tr-btn" id="tm" onclick="sw('m')">월간 리포트</button>
+</div>
+
+<div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:10px">
+
+<!-- ===== WEEKLY REPORT ===== -->
+<div class="sc vis" id="sw"><div class="ph">
+
+<div style="padding:14px 16px 10px">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="display:flex;align-items:center;gap:8px">
+<i class="ti ti-chevron-left" style="font-size:18px;color:var(--color-text-tertiary);cursor:pointer" aria-hidden="true"></i>
+<div>
+<p style="font-size:11px;color:var(--color-text-tertiary);margin:0">6월 3주차</p>
+<p style="font-size:17px;font-weight:500;margin:2px 0 0">6.16 ~ 6.22 주간 리포트</p>
+</div>
+<i class="ti ti-chevron-right" style="font-size:18px;color:var(--color-text-tertiary);cursor:pointer" aria-hidden="true"></i>
+</div>
+<i class="ti ti-share" style="font-size:18px;color:var(--color-text-secondary);cursor:pointer" aria-hidden="true"></i>
+</div>
+</div>
+
+<div class="sec">
+<div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:14px">
+<p style="font-size:14px;font-weight:500;margin:0 0 4px;color:var(--color-text-primary)">지난주보다 야간 활동이 조금 늘었어요</p>
+<p style="font-size:12px;color:var(--color-text-secondary);margin:0">주간 활동은 안정적이었지만, 6/18 약물 변경 이후 야간 배회가 2회 발생했어요. 전반적인 정서 상태는 지난주와 비슷해요.</p>
+</div>
+</div>
+
+<div class="sec">
+<p class="sec-t">핵심 지표</p>
+<div class="sg">
+<div class="mc">
+<p style="font-size:11px;color:var(--color-text-tertiary);margin:0">알림 발생</p>
+<div style="display:flex;align-items:baseline;gap:4px;margin-top:2px">
+<span style="font-size:20px;font-weight:500;color:var(--color-text-primary)">5회</span>
+<span class="tag" style="background:var(--color-background-warning);color:var(--color-text-warning)"><i class="ti ti-arrow-up" style="font-size:10px" aria-hidden="true"></i>+2</span>
+</div>
+</div>
+<div class="mc">
+<p style="font-size:11px;color:var(--color-text-tertiary);margin:0">오탐률</p>
+<div style="display:flex;align-items:baseline;gap:4px;margin-top:2px">
+<span style="font-size:20px;font-weight:500;color:var(--color-text-primary)">20%</span>
+<span class="tag" style="background:var(--color-background-success);color:var(--color-text-success)"><i class="ti ti-arrow-down" style="font-size:10px" aria-hidden="true"></i>-10%</span>
+</div>
+</div>
+<div class="mc">
+<p style="font-size:11px;color:var(--color-text-tertiary);margin:0">야간 깸</p>
+<div style="display:flex;align-items:baseline;gap:4px;margin-top:2px">
+<span style="font-size:20px;font-weight:500;color:var(--color-text-primary)">평균 1.7회</span>
+</div>
+<p style="font-size:10px;color:var(--color-text-warning);margin:2px 0 0">지난주 0.9회</p>
+</div>
+<div class="mc">
+<p style="font-size:11px;color:var(--color-text-tertiary);margin:0">평균 수면</p>
+<div style="display:flex;align-items:baseline;gap:4px;margin-top:2px">
+<span style="font-size:20px;font-weight:500;color:var(--color-text-primary)">7.2시간</span>
+</div>
+<p style="font-size:10px;color:var(--color-text-tertiary);margin:2px 0 0">지난주 7.8시간</p>
+</div>
+</div>
+</div>
+
+<div class="sec">
+<p class="sec-t">요일별 알림 분포</p>
+<div style="display:flex;align-items:flex-end;gap:4px;height:80px;padding:0 4px">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+<div style="width:100%;background:var(--color-background-success);border-radius:3px 3px 0 0;height:16px"></div>
+<span style="font-size:10px;color:var(--color-text-tertiary)">월</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+<div style="width:100%;background:var(--color-background-success);border-radius:3px 3px 0 0;height:0px"></div>
+<span style="font-size:10px;color:var(--color-text-tertiary)">화</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+<div style="width:100%;background:var(--color-background-warning);border-radius:3px 3px 0 0;height:32px"></div>
+<span style="font-size:10px;color:var(--color-text-tertiary)">수</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+<div style="width:100%;background:var(--color-background-success);border-radius:3px 3px 0 0;height:16px"></div>
+<span style="font-size:10px;color:var(--color-text-tertiary)">목</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+<div style="width:100%;background:var(--color-background-success);border-radius:3px 3px 0 0;height:0px"></div>
+<span style="font-size:10px;color:var(--color-text-tertiary)">금</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+<div style="width:100%;background:var(--color-background-warning);border-radius:3px 3px 0 0;height:48px"></div>
+<span style="font-size:10px;color:var(--color-text-tertiary)">토</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+<div style="width:100%;background:var(--color-background-warning);border-radius:3px 3px 0 0;height:64px"></div>
+<span style="font-size:10px;color:var(--color-text-warning);font-weight:500">일</span>
+</div>
+</div>
+<p style="font-size:11px;color:var(--color-text-tertiary);margin:6px 0 0;text-align:center">주말에 알림이 집중됨 · 약물 변경(6/18 수) 이후 증가 추세</p>
+</div>
+
+<div class="sec">
+<p class="sec-t"><i class="ti ti-bulb" style="font-size:14px" aria-hidden="true"></i> AI 패턴 인사이트</p>
+<div style="background:var(--color-background-info);border-radius:var(--border-radius-lg);padding:12px;margin-bottom:8px">
+<p style="font-size:12px;font-weight:500;color:var(--color-text-info);margin:0 0 4px">약물 변경과 야간 행동 상관관계</p>
+<p style="font-size:12px;color:var(--color-text-secondary);margin:0">6/18 약물 변경 이후 야간 배회가 0회 → 2회로 증가했어요. 약물 적응 기간(보통 1~2주)일 수 있지만, 지속되면 의료진 상담을 권해요.</p>
+</div>
+<div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:12px">
+<p style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px">식사량 감소 추세</p>
+<p style="font-size:12px;color:var(--color-text-secondary);margin:0">이번 주 식사 거부/절반이 4회로 지난주(1회)보다 늘었어요. 정서 상태 '불안' 태그와 겹치는 날이 많아요.</p>
+</div>
+</div>
+
+<div class="sec">
+<p class="sec-t"><i class="ti ti-heart" style="font-size:14px" aria-hidden="true"></i> 보호자님 이번 주</p>
+<div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px">
+<div class="sg" style="margin-bottom:8px">
+<div>
+<p style="font-size:11px;color:var(--color-text-tertiary);margin:0">야간 깨움</p>
+<p style="font-size:15px;font-weight:500;margin:2px 0 0;color:var(--color-text-primary)">4회</p>
+<p style="font-size:10px;color:var(--color-text-warning);margin:1px 0 0">지난주 1회</p>
+</div>
+<div>
+<p style="font-size:11px;color:var(--color-text-tertiary);margin:0">평균 대응 시간</p>
+<p style="font-size:15px;font-weight:500;margin:2px 0 0;color:var(--color-text-primary)">6분</p>
+<p style="font-size:10px;color:var(--color-text-success);margin:1px 0 0">충분히 빠른 대응이에요</p>
+</div>
+</div>
+<div style="border-top:0.5px solid var(--color-border-tertiary);padding-top:8px">
+<p style="font-size:12px;color:var(--color-text-secondary);margin:0">야간 깨움이 늘었어요. 수면의 질이 떨어지셨을 수 있어요. 가능하다면 다른 가족에게 야간 교대를 부탁하시는 것도 방법이에요.</p>
+</div>
+</div>
+</div>
+
+<div style="padding:0 16px 14px">
+<button style="width:100%;padding:10px;font-size:13px;border-radius:var(--border-radius-md);cursor:pointer">카카오톡으로 가족에게 공유</button>
+</div>
+
+<div style="border-top:0.5px solid var(--color-border-tertiary);padding:8px 16px;display:flex;justify-content:space-around">
+<div style="text-align:center"><i class="ti ti-home" style="font-size:18px;color:var(--color-text-tertiary)" aria-hidden="true"></i><p style="font-size:9px;color:var(--color-text-tertiary);margin:1px 0 0">홈</p></div>
+<div style="text-align:center"><i class="ti ti-notebook" style="font-size:18px;color:var(--color-text-tertiary)" aria-hidden="true"></i><p style="font-size:9px;color:var(--color-text-tertiary);margin:1px 0 0">일지</p></div>
+<div style="text-align:center"><i class="ti ti-chart-bar" style="font-size:18px;color:var(--color-text-info)" aria-hidden="true"></i><p style="font-size:9px;color:var(--color-text-info);margin:1px 0 0">리포트</p></div>
+<div style="text-align:center"><i class="ti ti-settings" style="font-size:18px;color:var(--color-text-tertiary)" aria-hidden="true"></i><p style="font-size:9px;color:var(--color-text-tertiary);margin:1px 0 0">설정</p></div>
+</div>
+
+</div></div>
+
+<!-- ===== MONTHLY REPORT ===== -->
+<div class="sc" id="sm"><div class="ph">
+
+<div style="padding:14px 16px 10px">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="display:flex;align-items:center;gap:8px">
+<i class="ti ti-chevron-left" style="font-size:18px;color:var(--color-text-tertiary);cursor:pointer" aria-hidden="true"></i>
+<div>
+<p style="font-size:11px;color:var(--color-text-tertiary);margin:0">2026년</p>
+<p style="font-size:17px;font-weight:500;margin:2px 0 0">6월 월간 리포트</p>
+</div>
+<i class="ti ti-chevron-right" style="font-size:18px;color:var(--color-text-tertiary);cursor:pointer" aria-hidden="true"></i>
+</div>
+<i class="ti ti-download" style="font-size:18px;color:var(--color-text-secondary);cursor:pointer" aria-hidden="true"></i>
+</div>
+</div>
+
+<div class="sec">
+<div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:14px">
+<p style="font-size:14px;font-weight:500;margin:0 0 4px;color:var(--color-text-primary)">5월 대비 야간 행동이 증가했지만, 낮 활동은 안정적이에요</p>
+<p style="font-size:12px;color:var(--color-text-secondary);margin:0">6/18 약물 변경 이후 야간 패턴 변화가 뚜렷해요. 낙상 위험 감지는 줄었고, 식사 패턴에 주의가 필요해요.</p>
+</div>
+</div>
+
+<div class="sec">
+<p class="sec-t">월간 요약</p>
+<div class="sg">
+<div class="mc">
+<p style="font-size:11px;color:var(--color-text-tertiary);margin:0">전체 알림</p>
+<div style="display:flex;align-items:baseline;gap:4px;margin-top:2px">
+<span style="font-size:20px;font-weight:500;color:var(--color-text-primary)">17회</span>
+<span class="tag" style="background:var(--color-background-success);color:var(--color-text-success)"><i class="ti ti-arrow-down" style="font-size:10px" aria-hidden="true"></i>-3</span>
+</div>
+<p style="font-size:10px;color:var(--color-text-success);margin:2px 0 0">5월 대비 감소</p>
+</div>
+<div class="mc">
+<p style="font-size:11px;color:var(--color-text-tertiary);margin:0">오탐률</p>
+<div style="display:flex;align-items:baseline;gap:4px;margin-top:2px">
+<span style="font-size:20px;font-weight:500;color:var(--color-text-primary)">18%</span>
+<span class="tag" style="background:var(--color-background-success);color:var(--color-text-success)"><i class="ti ti-arrow-down" style="font-size:10px" aria-hidden="true"></i>-12%</span>
+</div>
+<p style="font-size:10px;color:var(--color-text-success);margin:2px 0 0">시스템이 학습하고 있어요</p>
+</div>
+</div>
+</div>
+
+<div class="sec">
+<p class="sec-t">유형별 알림 분포</p>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div>
+<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:var(--color-text-primary)">야간 배회/활동</span><span style="color:var(--color-text-secondary)">7회</span></div>
+<div style="height:8px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden"><div style="height:100%;width:41%;background:#534AB7;border-radius:4px"></div></div>
+</div>
+<div>
+<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:var(--color-text-primary)">낙상 위험</span><span style="color:var(--color-text-secondary)">4회</span></div>
+<div style="height:8px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden"><div style="height:100%;width:24%;background:#EF9F27;border-radius:4px"></div></div>
+</div>
+<div>
+<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:var(--color-text-primary)">배회 (주간)</span><span style="color:var(--color-text-secondary)">4회</span></div>
+<div style="height:8px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden"><div style="height:100%;width:24%;background:#378ADD;border-radius:4px"></div></div>
+</div>
+<div>
+<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:var(--color-text-primary)">공격 행동</span><span style="color:var(--color-text-secondary)">2회</span></div>
+<div style="height:8px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden"><div style="height:100%;width:12%;background:#E24B4A;border-radius:4px"></div></div>
+</div>
+</div>
+</div>
+
+<div class="sec">
+<p class="sec-t">주차별 추이</p>
+<div style="display:flex;align-items:flex-end;gap:6px;height:80px">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+<span style="font-size:10px;font-weight:500;color:var(--color-text-primary)">3</span>
+<div style="width:100%;background:#534AB7;opacity:0.3;border-radius:3px 3px 0 0;height:24px"></div>
+<span style="font-size:10px;color:var(--color-text-tertiary)">1주</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+<span style="font-size:10px;font-weight:500;color:var(--color-text-primary)">3</span>
+<div style="width:100%;background:#534AB7;opacity:0.3;border-radius:3px 3px 0 0;height:24px"></div>
+<span style="font-size:10px;color:var(--color-text-tertiary)">2주</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+<span style="font-size:10px;font-weight:500;color:var(--color-text-primary)">5</span>
+<div style="width:100%;background:#534AB7;opacity:0.6;border-radius:3px 3px 0 0;height:40px"></div>
+<span style="font-size:10px;color:var(--color-text-tertiary)">3주</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+<span style="font-size:10px;font-weight:500;color:var(--color-text-primary)">6</span>
+<div style="width:100%;background:#534AB7;border-radius:3px 3px 0 0;height:48px"></div>
+<span style="font-size:10px;color:var(--color-text-tertiary)">4주</span>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:4px;margin-top:6px">
+<div style="flex:1;border-top:0.5px dashed var(--color-border-tertiary)"></div>
+<span style="font-size:10px;color:var(--color-text-tertiary)">6/18 약물 변경</span>
+<i class="ti ti-arrow-up" style="font-size:10px;color:var(--color-text-tertiary)" aria-hidden="true"></i>
+</div>
+</div>
+
+<div class="sec">
+<p class="sec-t"><i class="ti ti-heart" style="font-size:14px" aria-hidden="true"></i> 보호자님의 한 달</p>
+<div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px">
+<div class="sg" style="margin-bottom:10px">
+<div>
+<p style="font-size:11px;color:var(--color-text-tertiary);margin:0">야간 깨움</p>
+<p style="font-size:18px;font-weight:500;margin:2px 0 0;color:var(--color-text-primary)">총 12회</p>
+<p style="font-size:10px;color:var(--color-text-warning);margin:1px 0 0">5월 5회 대비 증가</p>
+</div>
+<div>
+<p style="font-size:11px;color:var(--color-text-tertiary);margin:0">수면 방해 시간</p>
+<p style="font-size:18px;font-weight:500;margin:2px 0 0;color:var(--color-text-primary)">약 6시간</p>
+<p style="font-size:10px;color:var(--color-text-warning);margin:1px 0 0">5월 2시간 대비 증가</p>
+</div>
+</div>
+
+<div style="background:var(--color-background-warning);border-radius:var(--border-radius-md);padding:10px;margin-bottom:8px">
+<p style="font-size:12px;font-weight:500;color:var(--color-text-warning);margin:0 0 4px">보호자 부담이 늘고 있어요</p>
+<p style="font-size:12px;color:var(--color-text-secondary);margin:0">야간 대응이 5월 대비 2.4배 증가했어요. 이 수준이 지속되면 보호자 소진 위험이 있어요. 가족 교대, 야간 돌봄 서비스, 또는 단기 입소를 고려해보세요.</p>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--color-text-secondary)">
+<div style="display:flex;align-items:center;gap:6px"><i class="ti ti-phone" style="font-size:14px;color:var(--color-text-info)" aria-hidden="true"></i><span>치매안심센터 상담 전화 1899-9988</span></div>
+<div style="display:flex;align-items:center;gap:6px"><i class="ti ti-phone" style="font-size:14px;color:var(--color-text-info)" aria-hidden="true"></i><span>장기요양 상담 1644-8000</span></div>
+</div>
+</div>
+</div>
+
+<div class="sec">
+<p class="sec-t"><i class="ti ti-stethoscope" style="font-size:14px" aria-hidden="true"></i> 의료진 공유용</p>
+<div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px">
+<p style="font-size:12px;color:var(--color-text-secondary);margin:0 0 8px">다음 진료 시 의사에게 보여줄 수 있는 1페이지 요약을 만들어드려요. 야간 행동 변화, 식사 패턴, 약물 변경 전후 비교가 포함돼요.</p>
+<button style="width:100%;padding:9px;font-size:12px;border-radius:var(--border-radius-md);cursor:pointer;background:var(--color-background-info);color:var(--color-text-info);border:0.5px solid var(--color-border-info)">진료용 PDF 내보내기</button>
+</div>
+</div>
+
+<div style="padding:0 16px 14px">
+<button style="width:100%;padding:10px;font-size:13px;border-radius:var(--border-radius-md);cursor:pointer">카카오톡으로 가족에게 공유</button>
+</div>
+
+<div style="border-top:0.5px solid var(--color-border-tertiary);padding:8px 16px;display:flex;justify-content:space-around">
+<div style="text-align:center"><i class="ti ti-home" style="font-size:18px;color:var(--color-text-tertiary)" aria-hidden="true"></i><p style="font-size:9px;color:var(--color-text-tertiary);margin:1px 0 0">홈</p></div>
+<div style="text-align:center"><i class="ti ti-notebook" style="font-size:18px;color:var(--color-text-tertiary)" aria-hidden="true"></i><p style="font-size:9px;color:var(--color-text-tertiary);margin:1px 0 0">일지</p></div>
+<div style="text-align:center"><i class="ti ti-chart-bar" style="font-size:18px;color:var(--color-text-info)" aria-hidden="true"></i><p style="font-size:9px;color:var(--color-text-info);margin:1px 0 0">리포트</p></div>
+<div style="text-align:center"><i class="ti ti-settings" style="font-size:18px;color:var(--color-text-tertiary)" aria-hidden="true"></i><p style="font-size:9px;color:var(--color-text-tertiary);margin:1px 0 0">설정</p></div>
+</div>
+
+</div></div>
+
+</div>
+</div>
+
+<script>
+function sw(t){
+document.getElementById('sw').className=t==='w'?'sc vis':'sc';
+document.getElementById('sm').className=t==='m'?'sc vis':'sc';
+document.getElementById('tw').className=t==='w'?'tr-btn on':'tr-btn';
+document.getElementById('tm').className=t==='m'?'tr-btn on':'tr-btn';
+}
+</script>
